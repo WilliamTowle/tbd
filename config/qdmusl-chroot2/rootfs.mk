@@ -6,9 +6,12 @@ include ${CONFIG_DIR}/settings.mk
 
 PACKAGE_DESTINATION_RULES=target
 PACKAGE_DESTDIR=${STAGING_DIR}/rootfs
+include ${PACKAGE_DIR}/musl/v0.9.13.mk
+include ${PACKAGE_DIR}/dash/v0.5.12.mk
 
-all-rootfs:
-	@printf '[initrd %s] %s\n' $@ 'No package targets defined'
+all-rootfs: \
+	install-target-musl \
+	install-target-dash
 	@printf '[rootfs %s] %s\n' $@ "Done at `date +'%F, %X'`"
 
 clean-rootfs:
