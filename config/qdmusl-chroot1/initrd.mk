@@ -9,9 +9,11 @@ PACKAGE_DESTDIR=${STAGING_DIR}/initrd
 include ${PACKAGE_DIR}/musl/v0.9.13.mk
 include ${PACKAGE_DIR}/dash/v0.5.12.mk
 include ${PACKAGE_DIR}/sbase/v0.1.mk
+include ${PACKAGE_DIR}/ubase/v0.1.mk
 
 all-initrd: \
 	install-target-musl \
 	install-target-dash \
-	install-target-sbase
+	install-target-sbase \
+	install-target-ubase
 	@printf '[initrd %s] %s\n' $@ "Done at `date +'%F, %X'`"
