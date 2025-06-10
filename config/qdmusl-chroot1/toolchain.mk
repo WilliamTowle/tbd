@@ -6,11 +6,10 @@ include ${CONFIG_DIR}/settings.mk
 
 PACKAGE_DESTINATION_RULES=toolchain
 
-all-toolchain:
-	@printf '[toolchain %s] %s\n' $@ 'No package targets defined'
-	@printf '[toolchain %s] %s\n' $@ "Done at `date +'%F, %X'`"
+include ${PACKAGE_DIR}/linux/v3.4.113.mk
 
-clean-toolchain:
-	-rm -rf ${TOOLCHAIN_DIR}
+all-toolchain: \
+	install-toolchain-lxheaders
+	@printf '[toolchain %s] %s\n' $@ "Done at `date +'%F, %X'`"
 
 distclean-toolchain:
