@@ -19,4 +19,4 @@ TARGET_TRIPLET=${TARGET_CPU}-custom-linux-musl
 
 export PATH:=${TOOLCHAIN_DIR}/bin:${PATH}
 
-ALL_COMPONENTS=toolchain
+ALL_COMPONENTS=toolchain initrd
