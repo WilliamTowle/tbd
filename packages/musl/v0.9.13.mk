@@ -75,3 +75,35 @@ install-toolchain-cross-musl: build-toolchain-cross-musl
 		ln -sf ${TOOLCHAIN_DIR}/lib/libc.so ${TOOLCHAIN_DIR}/lib/ld-musl-${TARGET_CPU}.so.1 ;\
 		}
 endif
+
+ifeq (${PACKAGE_DESTINATION_RULES},target)
+.PHONY: build-target-musl
+
+build-target-musl: prepare-cross-musl
+	mkdir -p ${CROSS_MUSL_SRC_TREE}/$@
+	( cd ${CROSS_MUSL_SRC_TREE}/$@ && [ -r ./configure ] || ln -sf ../* ./ )
+	[ -r ${CROSS_MUSL_SRC_TREE}/$@/config.mak ] || { \
+		printf '[%s] %s\n' $@ 'Configure...' && \
+		cd ${CROSS_MUSL_SRC_TREE}/$@ && \
+		CROSS_COMPILE=${TARGET_TRIPLET}- \
+		  ./configure --prefix=/ \
+			--target=${TARGET_TRIPLET} \
+			--syslibdir=/lib \
+			--includedir=/usr/include \
+			--disable-gcc-wrapper ;\
+		}
+	[ -r ${TARGET_ROOTFS}/lib/ld-musl-${TARGET_CPU}.so.1 ] || { \
+		printf '[%s] %s\n' $@ 'Build...' && \
+		cd ${CROSS_MUSL_SRC_TREE}/$@ && \
+		make ;\
+		}
+
+.PHONY: install-target-musl
+
+install-target-musl: build-target-musl
+	[ -r ${PACKAGE_DESTDIR}/lib/ld-musl-${TARGET_CPU}.so.1 ] || { \
+		printf '[%s] %s\n' $@ 'Install...' && \
+		cd ${CROSS_MUSL_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		make install DESTDIR=${PACKAGE_DESTDIR} ;\
+		}
+endif
