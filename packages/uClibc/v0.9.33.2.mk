@@ -65,4 +65,32 @@ install-cross-uclibc-startfiles: build-cross-uclibc-startfiles
 		make PREFIX=${TOOLCHAIN_DIR}'/usr/' install_headers && \
 		make PREFIX=${TOOLCHAIN_DIR}'/' install_startfiles ;\
 	}
+
+
+.PHONY: build-cross-uclibc-libc
+
+build-cross-uclibc-libc: prepare-cross-uclibc
+	@printf '%s %s: %s\n' $(lastword ${MAKEFILE_LIST}) $@ "Reached at `date +'%X, %F'`"
+	mkdir -p ${CROSS_UCLIBC_SRC_TREE}/$@
+	( cd ${CROSS_UCLIBC_SRC_TREE}/$@ && [ -r ./Makefile ] || ln -sf ../* ./ )
+	[ -r ${CROSS_UCLIBC_SRC_TREE}/$@/.config ] || { \
+		printf '[%s] %s\n' $@ 'Configure...' && \
+		cd ${CROSS_UCLIBC_SRC_TREE}/$@ && \
+		cp ../build-cross-uclibc-startfiles/.config ./ ;\
+	}
+	[ -r ${CROSS_UCLIBC_SRC_TREE}/$@/lib/crtn.o ] || { \
+		printf '[%s] %s\n' $@ 'Build...' && \
+		cd ${CROSS_UCLIBC_SRC_TREE}/$@ && \
+		make ;\
+	}
+
+
+.PHONY: install-cross-uclibc-libc
+
+install-cross-uclibc-libc: build-cross-uclibc-libc
+	[ -r ${TOOLCHAIN_DIR}/lib/libc.a ] || { \
+		printf '[%s] %s\n' $@ 'Install...' && \
+		cd ${CROSS_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		make PREFIX=${TOOLCHAIN_DIR}'/' install ;\
+	}
 endif
