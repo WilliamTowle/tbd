@@ -15,7 +15,8 @@ all-toolchain: \
 	install-toolchain-cross-binutils \
 	install-toolchain-cross-kgcc \
 	install-toolchain-lxheaders \
-	install-cross-uclibc-startfiles
+	install-cross-uclibc-startfiles \
+	install-cross-libgcc
 	@printf '[toolchain %s] %s\n' $@ "Done at `date +'%F, %X'`"
 
 clean-toolchain:
