@@ -111,4 +111,47 @@ install-toolchain-cross-kgcc: build-toolchain-cross-kgcc
 		cd ${CROSS_GCC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make install-gcc ;\
 		}
+
+
+.PHONY: build-cross-libgcc
+
+build-cross-libgcc: prepare-cross-gcc
+	@printf '%s %s: %s\n' $(lastword ${MAKEFILE_LIST}) $@ "Reached at `date +'%X, %F'`"
+	mkdir -p ${CROSS_GCC_SRC_TREE}/$@
+	[ -r ${CROSS_GCC_SRC_TREE}/$@/config.log ] || { \
+		printf '[%s] %s\n' $@ 'Configure...' && \
+		cd ${CROSS_GCC_SRC_TREE}/$@ && \
+		  ../configure -v \
+			--prefix=${TOOLCHAIN_DIR} \
+			--program-transform-name='s%^%'${TARGET_TRIPLET}'-k%' \
+			--build=${HOST_TRIPLET} --host=${HOST_TRIPLET} \
+			--target=${TARGET_TRIPLET} \
+			--with-sysroot=${TOOLCHAIN_DIR} \
+			--without-headers --with-newlib \
+			--disable-multilib \
+			--disable-shared \
+			--disable-threads \
+			--disable-decimal-float \
+			--disable-libgomp \
+			--disable-libmudflap \
+			--disable-libquadmath \
+			--disable-libssp \
+			--enable-languages=c --disable-__cxa_atexit \
+			--disable-nls --disable-werror ;\
+		}
+	[ -r ${CROSS_GCC_SRC_TREE}/$@/gcc/libgcc.a ] || { \
+		printf '[%s] %s\n' $@ 'Build...' && \
+		cd ${CROSS_GCC_SRC_TREE}/$@ && \
+		make $(shell echo 'enable_shared=no' >/dev/null) all-target-libgcc ;\
+		}
+
+
+.PHONY: install-cross-libgcc
+
+install-cross-libgcc: build-cross-libgcc
+	[ -r ${TOOLCHAIN_DIR}/lib/gcc/${TARGET_TRIPLET}/${CROSS_GCC_VERSION}/libgcc.a ] || { \
+		printf '[%s] %s\n' $@ 'Install...' && \
+		cd ${CROSS_GCC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		make install-target-libgcc ;\
+		}
 endif
