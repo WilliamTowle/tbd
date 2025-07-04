@@ -17,7 +17,8 @@ all-toolchain: \
 	install-toolchain-lxheaders \
 	install-cross-glibc-startfiles \
 	install-cross-libgcc \
-	install-cross-glibc-libc
+	install-cross-glibc-libc \
+	install-cross-gcc
 	@printf '[toolchain %s] %s\n' $@ "Done at `date +'%F, %X'`"
 
 clean-toolchain:
