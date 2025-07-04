@@ -158,4 +158,49 @@ install-cross-libgcc: build-cross-libgcc
 		cd ${CROSS_GCC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make install-target-libgcc ;\
 		}
+
+
+.PHONY: build-cross-gcc
+
+build-cross-gcc: prepare-cross-gcc
+	@printf '%s %s: %s\n' $(lastword ${MAKEFILE_LIST}) $@ "Reached at `date +'%X, %F'`"
+	mkdir -p ${CROSS_GCC_SRC_TREE}/$@
+	[ -r ${CROSS_GCC_SRC_TREE}/$@/config.log ] || { \
+		printf '[%s] %s\n' $@ 'Configure...' && \
+		cd ${CROSS_GCC_SRC_TREE}/$@ && \
+		  ../configure -v \
+			--prefix=${TOOLCHAIN_DIR} \
+			--program-transform-name='s%^%'${TARGET_TRIPLET}'%' \
+			--build=${HOST_TRIPLET} --host=${HOST_TRIPLET} \
+			--target=${TARGET_TRIPLET} \
+			--with-sysroot=${TOOLCHAIN_DIR} \
+			$(shell echo "--with-headers=${TOOLCHAIN_DIR}/usr/include" 2>/dev/null) \
+			--disable-multilib \
+			--disable-shared $(shell echo "--enable-shared" >/dev/null) \
+			--disable-threads \
+			--disable-decimal-float \
+			--disable-libgomp \
+			--disable-libmudflap \
+			--disable-libquadmath \
+			--disable-libssp \
+			--enable-languages=c --disable-__cxa_atexit \
+			--disable-nls --disable-werror ;\
+		}
+	[ -r ${CROSS_GCC_SRC_TREE}/$@/gcc/include-fixed/README ] || { \
+		printf '[%s] %s\n' $@ 'Build...' && \
+		cd ${CROSS_GCC_SRC_TREE}/$@ && \
+		make all ;\
+		}
+
+
+.PHONY: install-cross-gcc
+
+install-cross-gcc: build-cross-gcc
+	[ -r ${TOOLCHAIN_DIR}/bin/${TARGET_TRIPLET}-gcc ] || { \
+		printf '[%s] %s\n' $@ 'Install...' && \
+		cd ${CROSS_GCC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		make install && \
+		cd ${TOOLCHAIN_DIR}/bin && \
+		ln -sf ${TARGET_TRIPLET}-gcc-${CROSS_GCC_VERSION} ${TARGET_TRIPLET}-gcc ;\
+		}
 endif
