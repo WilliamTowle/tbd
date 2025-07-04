@@ -133,3 +133,33 @@ install-cross-glibc-libc: build-cross-glibc-libc
 		make install_root=${TOOLCHAIN_DIR} install ;\
 	}
 endif
+
+
+ifeq (${PACKAGE_DESTINATION_RULES},target)
+.PHONY: build-target-glibc
+
+## [2025-07-03] 'build' empty - install copies sysroot's libs
+
+build-target-glibc: prepare-cross-glibc
+	@printf '%s %s: %s\n' $(firstword ${MAKEFILE_LIST}) $@ "Reached at `date +'%X, %F'`"
+
+
+.PHONY: install-target-glibc
+
+install-target-glibc: build-target-glibc
+	[ -r ${PACKAGE_DESTDIR}/lib64/ld-linux-x86-64.so.2 ] || { \
+		printf '[%s] %s\n' $@ 'Install...' && \
+		mkdir -p ${PACKAGE_DESTDIR}/lib/ && \
+		for TCLIB in \
+			libc.so.* libm.so.* \
+			; do \
+				cp ${TOOLCHAIN_DIR}/lib/$${TCLIB} ${PACKAGE_DESTDIR}/lib/ ;\
+			done && \
+		mkdir -p ${PACKAGE_DESTDIR}/lib64/ && \
+		for TCLIB in \
+			ld*.so.* \
+			; do \
+				cp ${TOOLCHAIN_DIR}/lib/$${TCLIB} ${PACKAGE_DESTDIR}/lib64/ ;\
+			done ;\
+		}
+endif
