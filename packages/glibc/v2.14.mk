@@ -16,11 +16,11 @@ CROSS_GLIBC_SRC_TREE=${STAGING_DIR}/build-glibc-${CROSS_GLIBC_VERSION}
 
 prepare-cross-glibc:
 ifneq (${CROSS_GLIBC_VERSION},)
-	make -f $(lastword ${MAKEFILE_LIST}) download-archive SRC_URL=${CROSS_GLIBC_SRC_URL} SRC_TARBALL=${CROSS_GLIBC_SRC_TARBALL} SRC_CHECKSUM=${CROSS_GLIBC_SRC_CHECKSUM}
+	$(call download_file,$(CROSS_GLIBC_SRC_TARBALL),$(CROSS_GLIBC_SRC_URL),$(CROSS_GLIBC_SRC_CHECKSUM))
 endif
 	[ -r ${CROSS_GLIBC_SRC_TREE}/README ] || { \
 		printf '[%s] %s\n' $@ 'Extract...' && \
-		make -f $(lastword ${MAKEFILE_LIST}) extract-archive SRC_TARBALL=${CROSS_GLIBC_SRC_TARBALL} PACKAGE_SRC_TREE=${CROSS_GLIBC_SRC_TREE} && \
+		$(call extract_archive,$(CROSS_GLIBC_SRC_TREE),$(CROSS_GLIBC_SRC_TARBALL)) ;\
 		cd ${CROSS_GLIBC_SRC_TREE} && \
 		case ${CROSS_GLIBC_VERSION} in \
 		2.7) \
