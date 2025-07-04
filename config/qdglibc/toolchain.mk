@@ -6,8 +6,10 @@ include ${CONFIG_DIR}/settings.mk
 
 PACKAGE_DESTINATION_RULES=toolchain
 
-all-toolchain:
-	@printf '[toolchain %s] %s\n' $@ 'No package targets defined'
+include ${PACKAGE_DIR}/cross-binutils/v2.21.1.mk
+
+all-toolchain: \
+	install-toolchain-cross-binutils
 	@printf '[toolchain %s] %s\n' $@ "Done at `date +'%F, %X'`"
 
 clean-toolchain:
