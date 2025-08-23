@@ -11,7 +11,8 @@ HOST_TRIPLET=$(shell gcc -dumpmachine | sed 's/^\([^-]*\).*-\([^-]*-[^-]*.\)$$/\
 
 TARGET_CPU=$(shell uname -m)
 TARGET_ARCH=$(shell echo ${TARGET_CPU} | sed 's/i[4-6]86/i386/' )
-TARGET_TRIPLET=${TARGET_CPU}-nbl-linux-uclibc
+TARGET_LIBC=uclibc
+TARGET_TRIPLET=${TARGET_CPU}-nbl-linux-${TARGET_LIBC}
 
 
 export PATH:=${TOOLCHAIN_DIR}/bin:${PATH}
