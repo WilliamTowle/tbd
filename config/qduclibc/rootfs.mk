@@ -7,8 +7,10 @@ include ${CONFIG_DIR}/settings.mk
 PACKAGE_DESTINATION_RULES=target
 PACKAGE_DESTDIR=${STAGING_DIR}/rootfs
 
-all-rootfs:
-	@printf '[rootfs %s] %s\n' $@ 'No package targets defined'
+include ${PACKAGE_DIR}/uClibc-ng/v1.0.0.mk
+
+all-rootfs: \
+	install-target-uclibc
 	@printf '[rootfs %s] %s\n' $@ "Done at `date +'%F, %X'`"
 
 clean-rootfs:
