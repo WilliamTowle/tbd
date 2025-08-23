@@ -34,8 +34,8 @@ build-cross-uclibc-startfiles: prepare-cross-uclibc
 		printf '[%s] %s\n' $@ 'Configure...' && \
 		cd ${CROSS_UCLIBC_SRC_TREE}/$@ && \
 		( \
-		 echo 'TARGET_ARCH="'${TARGET_CPU}'"' ;\
-		 echo 'TARGET_'${TARGET_CPU}'=y' ;\
+		 echo 'TARGET_ARCH="'${TARGET_ARCH}'"' ;\
+		 echo 'TARGET_'${TARGET_ARCH}'=y' ;\
 		 echo 'CROSS_COMPILER_PREFIX="'${TARGET_TRIPLET}'-k"' ;\
 		 \
 		 echo 'KERNEL_HEADERS="'${TOOLCHAIN_DIR}'/usr/include/"' ;\
