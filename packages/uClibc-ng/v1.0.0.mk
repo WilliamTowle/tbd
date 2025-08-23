@@ -61,3 +61,38 @@ install-cross-uclibc: build-cross-uclibc
 		make PREFIX=${TOOLCHAIN_DIR}'/' install_dev ;\
 	}
 endif
+
+
+ifeq (${PACKAGE_DESTINATION_RULES},target)
+.PHONY: build-target-uclibc
+
+build-target-uclibc: prepare-cross-uclibc
+	@printf '%s %s: %s\n' $(firstword ${MAKEFILE_LIST}) $@ "Reached at `date +'%X, %F'`"
+	mkdir -p ${CROSS_UCLIBC_SRC_TREE}/$@
+	( cd ${CROSS_UCLIBC_SRC_TREE}/$@ && [ -r ./Makefile ] || ln -sf ../* ./ )
+	[ -r ${CROSS_UCLIBC_SRC_TREE}/$@/.config ] || { \
+		printf '[%s] %s\n' $@ 'Configure...' && \
+		cd ${CROSS_UCLIBC_SRC_TREE}/$@ && \
+		cp ../build-cross-uclibc/.config ./ ;\
+	}
+	[ -r ${CROSS_UCLIBC_SRC_TREE}/$@/lib/crtn.o ] || { \
+		printf '[%s] %s\n' $@ 'Build...' && \
+		cd ${CROSS_UCLIBC_SRC_TREE}/$@ && \
+		make ;\
+	}
+
+
+.PHONY: install-target-uclibc
+
+install-target-uclibc: build-target-uclibc
+	[ -r ${PACKAGE_DESTDIR}/lib/libuClibc-${CROSS_UCLIBC_VERSION}.so ] || { \
+		printf '[%s] %s\n' $@ 'Install...' && \
+		cd ${CROSS_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		make PREFIX=${PACKAGE_DESTDIR}'/' install_runtime && \
+		case ${CROSS_UCLIBC_VERSION} in \
+		1.0.0) \
+			[ ! -e $(PACKAGE_DESTDIR)/lib/ld64-uClibc.so.1 ] || ( cd $(PACKAGE_DESTDIR)/lib && ln -sf ld64-uClibc.so.1 ld64-uClibc.so.0 ) && \
+			[ ! -e $(PACKAGE_DESTDIR)/lib/ld-uClibc.so.1 ] || ( cd $(PACKAGE_DESTDIR)/lib && ln -sf ld-uClibc.so.1 ld-uClibc.so.0 ) ;;\
+		esac ;\
+	}
+endif
