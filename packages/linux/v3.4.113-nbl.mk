@@ -30,23 +30,24 @@ prepare-lxheaders: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 		cd ${TARGET_LINUX_SRC_TREE} && \
 		{ [ -r Makefile.OLD ] || mv Makefile Makefile.OLD ; } && \
 		cat Makefile.OLD \
-			| sed '/^ARCH/		s/?=.*/:= '${TARGET_CPU}'/' \
+			| sed '/^ARCH/		s/?=.*/:= '${TARGET_ARCH}'/' \
 			| sed '/^CROSS_COMPILE/	s/?=.*/:= '${TARGET_TRIPLET}'-k/' \
-		> Makefile && \
-		make mrproper ARCH=${TARGET_ARCH} && \
-		cat arch/x86/configs/${TARGET_ARCH}_defconfig \
-			| sed '/CONFIG_MODULES=y/ { s/^/# / ; s/=y/ is not set/ }' \
-			| sed '/CONFIG_EFI=y/ { s/$$/\nCONFIG_EFI_STUB=y\nCONFIG_EFI_MIXED=y/ }' \
-			| sed '/CONFIG_SND=y/ { s/^/# / ; s/=y/ is not set/ }' \
-			> .config.tmp && \
-		printf '%s\n' \
-			'CONFIG_LOCALVERSION="4xlx"' \
-			>> .config.tmp && \
-		cp .config.tmp .config && \
-		scripts/config --enable EMBEDDED && \
+		> Makefile ;\
+	}
+	[ -r ${TARGET_LINUX_SRC_TREE}/$@/.config ] || { \
+		mkdir -p ${TARGET_LINUX_SRC_TREE}/$@ &&\
+		cd ${TARGET_LINUX_SRC_TREE}/$@ &&\
+		make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} mrproper &&\
+		make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} ${TARGET_ARCH}_defconfig ARCH=${TARGET_ARCH} &&\
+		cp ${TARGET_LINUX_SRC_TREE}/scripts/config ./scripts &&\
+		scripts/config --disable MODULES &&\
+		scripts/config --enable CONFIG_EFI --enable CONFIG_EFI_STUB &&\
+		scripts/config --disable SND &&\
 		scripts/config --enable IKCONFIG --enable IKCONFIG_PROC && \
-		scripts/config --enable DEVTMPFS --enable DEVTMPFS_MOUNT --enable TMPFS ;\
-		yes '' | make ARCH=${TARGET_ARCH} oldconfig ;\
+		scripts/config --enable DEVTMPFS --enable DEVTMPFS_MOUNT --enable TMPFS &&\
+		scripts/config --set-str LOCALVERSION 'tbd' &&\
+		yes '' | make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
+			 ARCH=${TARGET_ARCH} oldconfig ;\
 	}
 
 
@@ -59,8 +60,8 @@ build-toolchain-lxheaders: prepare-lxheaders
 	[ -r ${TARGET_LINUX_SRC_TREE}/$@/include/linux/version.h ] || { \
 		printf '[%s] %s\n' $@ 'Build...' && \
 		cd ${TARGET_LINUX_SRC_TREE}/$@ && \
-		LANG=C make ARCH=${TARGET_ARCH} \
-			headers_check ;\
+		LANG=C make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
+			 ARCH=${TARGET_ARCH} headers_check ;\
 	}
 
 
@@ -70,7 +71,9 @@ install-toolchain-lxheaders: build-toolchain-lxheaders
 	[ -r ${TOOLCHAIN_DIR}/usr/include/asm/.install ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
 		cd ${TARGET_LINUX_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
-		LANG=C make ARCH=${TARGET_ARCH} \
-			INSTALL_HDR_PATH=${TOOLCHAIN_DIR}/usr headers_install ;\
+		cp ${TARGET_LINUX_SRC_TREE}/prepare-lxheaders/.config .config && \
+		LANG=C make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
+			headers_install \
+			ARCH=${TARGET_ARCH} INSTALL_HDR_PATH=${TOOLCHAIN_DIR}/usr headers_install ;\
 		}
 endif
