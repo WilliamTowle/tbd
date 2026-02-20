@@ -11,6 +11,7 @@ include ${PACKAGE_DIR}/busybox/v1.20.2.mk
 include ${PACKAGE_DIR}/uClibc/v0.9.33.2.mk
 
 all-rootfs: \
+	all-toolchain \
 	install-target-uclibc \
 	install-target-busybox
 	@printf '[rootfs %s] %s\n' $@ "Done at `date +'%F, %X'`"

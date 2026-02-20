@@ -8,6 +8,17 @@ ${STAGING_DIR}: ; @mkdir -p $@
 ${TOOLCHAIN_DIR}: ; @mkdir -p $@
 
 
+##
+
+.PHONY: all $(patsubst %,all-%,${ALL_COMPONENTS})
+
+$(patsubst %,all-%,${ALL_COMPONENTS}): all-%:
+	make -f ${CONFIG_DIR}/$*.mk $@
+
+all: $(patsubst %,all-%,${ALL_COMPONENTS})
+
+#
+
 .PHONY: clean distclean
 
 clean::

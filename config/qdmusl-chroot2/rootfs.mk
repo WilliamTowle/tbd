@@ -11,6 +11,7 @@ include ${PACKAGE_DIR}/dash/v0.5.12.mk
 include ${PACKAGE_DIR}/mksh/vR59c.mk
 
 all-rootfs: \
+	all-toolchain \
 	install-target-musl \
 	install-target-dash \
 	install-target-mksh

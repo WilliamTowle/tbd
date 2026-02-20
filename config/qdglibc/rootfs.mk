@@ -11,6 +11,7 @@ include ${PACKAGE_DIR}/glibc/v2.14.mk
 include ${PACKAGE_DIR}/dash/v0.5.8.mk
 
 all-rootfs: \
+	all-toolchain \
 	install-target-glibc \
 	install-target-dash
 	@printf '[rootfs %s] %s\n' $@ "Done at `date +'%F, %X'`"

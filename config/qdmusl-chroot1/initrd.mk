@@ -12,6 +12,7 @@ include ${PACKAGE_DIR}/sbase/v0.1.mk
 include ${PACKAGE_DIR}/ubase/v0.1.mk
 
 all-initrd: \
+	all-toolchain \
 	install-target-musl \
 	install-target-dash \
 	install-target-sbase \
