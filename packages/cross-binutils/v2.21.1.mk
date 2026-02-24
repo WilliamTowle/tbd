@@ -58,7 +58,7 @@ install-toolchain-cross-binutils: build-toolchain-cross-binutils
 		( cd ${CROSS_BINUTILS_SRC_TREE}/$(patsubst install-%,build-%,$@) && make install $(shell [ "`which makeinfo`" ] || echo 'MAKEINFO=/bin/true') ) ;\
 		( cd ${TOOLCHAIN_DIR}/bin ;\
 			for F in ar as ld nm objcopy objdump ranlib strip ; do \
-				 [ -r ${TARGET_TRIPLET}-$${F} ] && ln -sf ${TARGET_TRIPLET}-$${F} ${TARGET_TRIPLET}-k$${F} || { printf '%s: %s\n' $(firstword ${MAKEFILE_LIST}) "symlink failed for F=$${F}" ; false ;} ;\
+				 [ -r ${TARGET_TRIPLET}-k$${F} ] || ln -sf ${TARGET_TRIPLET}-$${F} ${TARGET_TRIPLET}-k$${F} || { printf '%s: %s\n' $(firstword ${MAKEFILE_LIST}) "symlink failed for F=$${F}" ; false ;} ;\
 			 done ;\
 		) ;\
 		}
