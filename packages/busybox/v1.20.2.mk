@@ -4,6 +4,7 @@
 # [2025-06-01] busybox 1.21.1 silentoldconfig bails on bookworm host
 # [2025-06-01] busybox 1.37.0 silentoldconfig bails on bookworm host
 
+ifeq ($(filter busybox,${ALL_PACKAGES}),)
 #TARGET_BUSYBOX_VERSION=1.19.3
 TARGET_BUSYBOX_VERSION=1.20.2
 #TARGET_BUSYBOX_VERSION=1.21.1
@@ -41,7 +42,6 @@ endif
 	}
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-busybox
 
 build-target-busybox: prepare-target-busybox
@@ -78,4 +78,5 @@ install-target-busybox: build-target-busybox
 		cd ${TARGET_BUSYBOX_SRC_TREE} && \
 		make install CONFIG_PREFIX=${PACKAGE_DESTDIR} ;\
 	}
+ALL_PACKAGES+=busybox
 endif

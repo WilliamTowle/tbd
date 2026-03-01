@@ -4,6 +4,7 @@
 
 # portlx had kernel 3.2.4 but modern perl rejects kernel/timeconst.pl
 
+ifeq ($(filter linux,${ALL_PACKAGES}),)
 #TARGET_LINUX_VERSION=2.6.28
 #TARGET_LINUX_VERSION=3.2.4
 TARGET_LINUX_VERSION=3.4.113
@@ -51,7 +52,6 @@ prepare-lxheaders: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	}
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-toolchain-lxheaders
 
 build-toolchain-lxheaders: prepare-lxheaders
@@ -76,4 +76,5 @@ install-toolchain-lxheaders: build-toolchain-lxheaders
 			headers_install \
 			ARCH=${TARGET_ARCH} INSTALL_HDR_PATH=${TOOLCHAIN_DIR}/usr headers_install ;\
 		}
+ALL_PACKAGES+=linux
 endif

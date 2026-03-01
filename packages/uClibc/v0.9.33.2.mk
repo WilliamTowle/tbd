@@ -1,10 +1,12 @@
-## TBD -- "Tiny By Design" musl package
+## TBD -- "Tiny By Design" uClibc package
 
 ## uclibc -- https://uclibc.org/
 
 # NB. possible invalid binaries with gcc5+ -- see crosstool-ng.github.io
 # Forked as uClibc-ng v1.0.0 c. 2015 -- see https://uclibc-ng.org/
 
+#|ifneq (${TOOLCHAIN_UCLIBC_VERSION},)
+ifeq ($(filter uclibc,${ALL_PACKAGES}),)
 COMMON_UCLIBC_VERSION=0.9.33.2
 COMMON_UCLIBC_SRC_TARBALL=${DOWNLOAD_DIR}/u/uClibc-${COMMON_UCLIBC_VERSION}.tar.bz2
 COMMON_UCLIBC_SRC_CHECKSUM=a338aaffc56f0f5040e6d9fa8a12eda1
@@ -21,8 +23,6 @@ prepare-common-uclibc: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 		$(call extract_archive,$(COMMON_UCLIBC_SRC_TREE),$(COMMON_UCLIBC_SRC_TARBALL)) ;\
 	}
 
-
-ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 
 .PHONY: build-cross-uclibc-startfiles
 
@@ -93,10 +93,8 @@ install-cross-uclibc-libc: build-cross-uclibc-libc
 		cd ${COMMON_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make PREFIX=${TOOLCHAIN_DIR}'/' install ;\
 	}
-endif
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-uclibc
 
 build-target-uclibc: prepare-common-uclibc
@@ -123,4 +121,6 @@ install-target-uclibc: build-target-uclibc
 		cd ${COMMON_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make PREFIX=${PACKAGE_DESTDIR}'/' install_runtime ;\
 	}
+
+ALL_PACKAGES+=uclibc
 endif
