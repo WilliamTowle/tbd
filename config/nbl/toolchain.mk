@@ -4,7 +4,6 @@ include ${CONFIG_DIR}/settings.mk
 -include ${CONFIG_DIR}/functions.mk
 -include ${CONFIG_DIR}/rules.mk
 
-PACKAGE_DESTINATION_RULES=toolchain
 
 include ${PACKAGE_DIR}/cross-binutils/v2.21.1.mk
 include ${PACKAGE_DIR}/cross-gcc/v4.3.6.mk

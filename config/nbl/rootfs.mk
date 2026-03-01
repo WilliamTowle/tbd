@@ -4,7 +4,6 @@ include ${CONFIG_DIR}/settings.mk
 -include ${CONFIG_DIR}/functions.mk
 -include ${CONFIG_DIR}/rules.mk
 
-PACKAGE_DESTINATION_RULES=target
 PACKAGE_DESTDIR=${STAGING_DIR}/rootfs
 
 include ${PACKAGE_DIR}/busybox/v1.20.2.mk
