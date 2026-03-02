@@ -5,36 +5,36 @@
 # NB. possible invalid binaries with gcc5+ -- see crosstool-ng.github.io
 # Forked as uClibc-ng v1.0.0 c. 2015 -- see https://uclibc-ng.org/
 
-CROSS_UCLIBC_VERSION=0.9.33.2
-CROSS_UCLIBC_SRC_TARBALL=${DOWNLOAD_DIR}/u/uClibc-${CROSS_UCLIBC_VERSION}.tar.bz2
-CROSS_UCLIBC_SRC_CHECKSUM=a338aaffc56f0f5040e6d9fa8a12eda1
-CROSS_UCLIBC_SRC_URL=https://uclibc.org/downloads/$(notdir ${CROSS_UCLIBC_SRC_TARBALL})
-CROSS_UCLIBC_SRC_TREE=${STAGING_DIR}/build-uclibc-${CROSS_UCLIBC_VERSION}
+COMMON_UCLIBC_VERSION=0.9.33.2
+COMMON_UCLIBC_SRC_TARBALL=${DOWNLOAD_DIR}/u/uClibc-${COMMON_UCLIBC_VERSION}.tar.bz2
+COMMON_UCLIBC_SRC_CHECKSUM=a338aaffc56f0f5040e6d9fa8a12eda1
+COMMON_UCLIBC_SRC_URL=https://uclibc.org/downloads/$(notdir ${COMMON_UCLIBC_SRC_TARBALL})
+COMMON_UCLIBC_SRC_TREE=${STAGING_DIR}/common-uclibc-${COMMON_UCLIBC_VERSION}
 
 
-.PHONY: prepare-uclibc
+.PHONY: prepare-common-uclibc
 
-prepare-cross-uclibc:
-	$(call download_file,$(CROSS_UCLIBC_SRC_TARBALL),$(CROSS_UCLIBC_SRC_URL),$(CROSS_UCLIBC_SRC_CHECKSUM))
-	[ -r ${CROSS_UCLIBC_SRC_TREE}/README ] || { \
+prepare-common-uclibc: | ${DOWNLOAD_DIR} ${STAGING_DIR}
+	$(call download_file,$(COMMON_UCLIBC_SRC_TARBALL),$(COMMON_UCLIBC_SRC_URL),$(COMMON_UCLIBC_SRC_CHECKSUM))
+	[ -r ${COMMON_UCLIBC_SRC_TREE}/README ] || { \
 		printf '[%s] %s\n' $@ 'Extract...' && \
-		$(call extract_archive,$(CROSS_UCLIBC_SRC_TREE),$(CROSS_UCLIBC_SRC_TARBALL)) ;\
+		$(call extract_archive,$(COMMON_UCLIBC_SRC_TREE),$(COMMON_UCLIBC_SRC_TARBALL)) ;\
 	}
 
 
-
 ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
+
 .PHONY: build-cross-uclibc-startfiles
 
-build-cross-uclibc-startfiles: prepare-cross-uclibc
+build-cross-uclibc-startfiles: prepare-common-uclibc
 	@printf '%s %s: %s\n' $(lastword ${MAKEFILE_LIST}) $@ "Reached at `date +'%X, %F'`"
-	mkdir -p ${CROSS_UCLIBC_SRC_TREE}/$@
-	( cd ${CROSS_UCLIBC_SRC_TREE}/$@ && [ -r ./Makefile ] || ln -sf ../* ./ )
-	[ -r ${CROSS_UCLIBC_SRC_TREE}/$@/.config ] || { \
+	mkdir -p ${COMMON_UCLIBC_SRC_TREE}/$@
+	( cd ${COMMON_UCLIBC_SRC_TREE}/$@ && [ -r ./Makefile ] || ln -sf ../* ./ )
+	[ -r ${COMMON_UCLIBC_SRC_TREE}/$@/.config ] || { \
 		printf '[%s] %s\n' $@ 'Configure...' && \
-		cd ${CROSS_UCLIBC_SRC_TREE}/$@ && \
+		cd ${COMMON_UCLIBC_SRC_TREE}/$@ && \
 		( \
-		 echo 'TARGET_ARCH="'${TARGET_ARCH}'"' ;\
+		 echo 'TOOLCHAIN_ARCH="'${TARGET_ARCH}'"' ;\
 		 echo 'TARGET_'${TARGET_ARCH}'=y' ;\
 		 echo 'CROSS_COMPILER_PREFIX="'${TARGET_TRIPLET}'-k"' ;\
 		 \
@@ -49,9 +49,9 @@ build-cross-uclibc-startfiles: prepare-cross-uclibc
 		) > .config && \
 		yes '' | make HOSTCC=/usr/bin/gcc oldconfig ;\
 	}
-	[ -r ${CROSS_UCLIBC_SRC_TREE}/$@/lib/crtn.o ] || { \
+	[ -r ${COMMON_UCLIBC_SRC_TREE}/$@/lib/crtn.o ] || { \
 		printf '[%s] %s\n' $@ 'Build...' && \
-		cd ${CROSS_UCLIBC_SRC_TREE}/$@ && \
+		cd ${COMMON_UCLIBC_SRC_TREE}/$@ && \
 		make headers startfiles ;\
 	}
 
@@ -61,7 +61,7 @@ build-cross-uclibc-startfiles: prepare-cross-uclibc
 install-cross-uclibc-startfiles: build-cross-uclibc-startfiles
 	[ -r ${TOOLCHAIN_DIR}/lib/crt1.o ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
-		cd ${CROSS_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		cd ${COMMON_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make PREFIX=${TOOLCHAIN_DIR}'/usr/' install_headers && \
 		make PREFIX=${TOOLCHAIN_DIR}'/' install_startfiles ;\
 	}
@@ -69,18 +69,18 @@ install-cross-uclibc-startfiles: build-cross-uclibc-startfiles
 
 .PHONY: build-cross-uclibc-libc
 
-build-cross-uclibc-libc: prepare-cross-uclibc
+build-cross-uclibc-libc: prepare-common-uclibc
 	@printf '%s %s: %s\n' $(lastword ${MAKEFILE_LIST}) $@ "Reached at `date +'%X, %F'`"
-	mkdir -p ${CROSS_UCLIBC_SRC_TREE}/$@
-	( cd ${CROSS_UCLIBC_SRC_TREE}/$@ && [ -r ./Makefile ] || ln -sf ../* ./ )
-	[ -r ${CROSS_UCLIBC_SRC_TREE}/$@/.config ] || { \
+	mkdir -p ${COMMON_UCLIBC_SRC_TREE}/$@
+	( cd ${COMMON_UCLIBC_SRC_TREE}/$@ && [ -r ./Makefile ] || ln -sf ../* ./ )
+	[ -r ${COMMON_UCLIBC_SRC_TREE}/$@/.config ] || { \
 		printf '[%s] %s\n' $@ 'Configure...' && \
-		cd ${CROSS_UCLIBC_SRC_TREE}/$@ && \
+		cd ${COMMON_UCLIBC_SRC_TREE}/$@ && \
 		cp ../build-cross-uclibc-startfiles/.config ./ ;\
 	}
-	[ -r ${CROSS_UCLIBC_SRC_TREE}/$@/lib/crtn.o ] || { \
+	[ -r ${COMMON_UCLIBC_SRC_TREE}/$@/lib/crtn.o ] || { \
 		printf '[%s] %s\n' $@ 'Build...' && \
-		cd ${CROSS_UCLIBC_SRC_TREE}/$@ && \
+		cd ${COMMON_UCLIBC_SRC_TREE}/$@ && \
 		make ;\
 	}
 
@@ -90,7 +90,7 @@ build-cross-uclibc-libc: prepare-cross-uclibc
 install-cross-uclibc-libc: build-cross-uclibc-libc
 	[ -r ${TOOLCHAIN_DIR}/lib/libc.a ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
-		cd ${CROSS_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		cd ${COMMON_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make PREFIX=${TOOLCHAIN_DIR}'/' install ;\
 	}
 endif
@@ -99,18 +99,18 @@ endif
 ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-uclibc
 
-build-target-uclibc: prepare-cross-uclibc
+build-target-uclibc: prepare-common-uclibc
 	@printf '%s %s: %s\n' $(firstword ${MAKEFILE_LIST}) $@ "Reached at `date +'%X, %F'`"
-	mkdir -p ${CROSS_UCLIBC_SRC_TREE}/$@
-	( cd ${CROSS_UCLIBC_SRC_TREE}/$@ && [ -r ./Makefile ] || ln -sf ../* ./ )
-	[ -r ${CROSS_UCLIBC_SRC_TREE}/$@/.config ] || { \
+	mkdir -p ${COMMON_UCLIBC_SRC_TREE}/$@
+	( cd ${COMMON_UCLIBC_SRC_TREE}/$@ && [ -r ./Makefile ] || ln -sf ../* ./ )
+	[ -r ${COMMON_UCLIBC_SRC_TREE}/$@/.config ] || { \
 		printf '[%s] %s\n' $@ 'Configure...' && \
-		cd ${CROSS_UCLIBC_SRC_TREE}/$@ && \
+		cd ${COMMON_UCLIBC_SRC_TREE}/$@ && \
 		cp ../build-cross-uclibc-startfiles/.config ./ ;\
 	}
-	[ -r ${CROSS_UCLIBC_SRC_TREE}/$@/lib/crtn.o ] || { \
+	[ -r ${COMMON_UCLIBC_SRC_TREE}/$@/lib/crtn.o ] || { \
 		printf '[%s] %s\n' $@ 'Build...' && \
-		cd ${CROSS_UCLIBC_SRC_TREE}/$@ && \
+		cd ${COMMON_UCLIBC_SRC_TREE}/$@ && \
 		make ;\
 	}
 
@@ -120,7 +120,7 @@ build-target-uclibc: prepare-cross-uclibc
 install-target-uclibc: build-target-uclibc
 	[ -r ${PACKAGE_DESTDIR}/lib/libc.so.0 ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
-		cd ${CROSS_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		cd ${COMMON_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make PREFIX=${PACKAGE_DESTDIR}'/' install_runtime ;\
 	}
 endif
