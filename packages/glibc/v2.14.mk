@@ -2,27 +2,27 @@
 
 ## glibc -- www.gnu.org
 
-CROSS_GLIBC_VERSION=2.14
-CROSS_GLIBC_SRC_TARBALL=${DOWNLOAD_DIR}/g/glibc-${CROSS_GLIBC_VERSION}.tar.bz2
-CROSS_GLIBC_SRC_CHECKSUM= $(strip \
-	$(if $(filter 2.7,${CROSS_GLIBC_VERSION}),065c5952b439deba40083ccd67bcc8f7,) \
-	$(if $(filter 2.14,${CROSS_GLIBC_VERSION}),1588cc22e796c296223744895ebc4cef,) \
+COMMON_GLIBC_VERSION=2.14
+COMMON_GLIBC_SRC_TARBALL=${DOWNLOAD_DIR}/g/glibc-${COMMON_GLIBC_VERSION}.tar.bz2
+COMMON_GLIBC_SRC_CHECKSUM= $(strip \
+	$(if $(filter 2.7,${COMMON_GLIBC_VERSION}),065c5952b439deba40083ccd67bcc8f7,) \
+	$(if $(filter 2.14,${COMMON_GLIBC_VERSION}),1588cc22e796c296223744895ebc4cef,) \
 	)
-CROSS_GLIBC_SRC_URL=https://ftp.gnu.org/gnu/glibc/$(notdir ${CROSS_GLIBC_SRC_TARBALL})
-CROSS_GLIBC_SRC_TREE=${STAGING_DIR}/build-glibc-${CROSS_GLIBC_VERSION}
+COMMON_GLIBC_SRC_URL=https://ftp.gnu.org/gnu/glibc/$(notdir ${COMMON_GLIBC_SRC_TARBALL})
+COMMON_GLIBC_SRC_TREE=${STAGING_DIR}/common-glibc-${COMMON_GLIBC_VERSION}
 
 
-.PHONY: prepare-cross-glibc
+.PHONY: prepare-common-glibc
 
-prepare-cross-glibc:
-ifneq (${CROSS_GLIBC_VERSION},)
-	$(call download_file,$(CROSS_GLIBC_SRC_TARBALL),$(CROSS_GLIBC_SRC_URL),$(CROSS_GLIBC_SRC_CHECKSUM))
+prepare-common-glibc: | ${DOWNLOAD_DIR} ${STAGING_DIR}
+ifneq (${COMMON_GLIBC_VERSION},)
+	$(call download_file,$(COMMON_GLIBC_SRC_TARBALL),$(COMMON_GLIBC_SRC_URL),$(COMMON_GLIBC_SRC_CHECKSUM))
 endif
-	[ -r ${CROSS_GLIBC_SRC_TREE}/README ] || { \
+	[ -r ${COMMON_GLIBC_SRC_TREE}/README ] || { \
 		printf '[%s] %s\n' $@ 'Extract...' && \
-		$(call extract_archive,$(CROSS_GLIBC_SRC_TREE),$(CROSS_GLIBC_SRC_TARBALL)) ;\
-		cd ${CROSS_GLIBC_SRC_TREE} && \
-		case ${CROSS_GLIBC_VERSION} in \
+		$(call extract_archive,$(COMMON_GLIBC_SRC_TREE),$(COMMON_GLIBC_SRC_TARBALL)) ;\
+		cd ${COMMON_GLIBC_SRC_TREE} && \
+		case ${COMMON_GLIBC_VERSION} in \
 		2.7) \
 			[ -r configure.OLD ] || mv configure configure.OLD ;\
 			cat configure.OLD \
@@ -50,12 +50,12 @@ endif
 ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-cross-glibc-startfiles
 
-build-cross-glibc-startfiles: prepare-cross-glibc
+build-cross-glibc-startfiles: prepare-common-glibc
 	@printf '%s %s: %s\n' $(lastword ${MAKEFILE_LIST}) $@ "Reached at `date +'%X, %F'`"
-	mkdir -p ${CROSS_GLIBC_SRC_TREE}/$@
-	[ -r ${CROSS_GLIBC_SRC_TREE}/$@/config.status ] || { \
+	mkdir -p ${COMMON_GLIBC_SRC_TREE}/$@
+	[ -r ${COMMON_GLIBC_SRC_TREE}/$@/config.status ] || { \
 		printf '[%s] %s\n' $@ 'Configure...' && \
-		cd ${CROSS_GLIBC_SRC_TREE}/$@ && \
+		cd ${COMMON_GLIBC_SRC_TREE}/$@ && \
 		CC=${TARGET_TRIPLET}-kgcc \
 		  AS=${TARGET_TRIPLET}-kas \
 		  LD=${TARGET_TRIPLET}-kld \
@@ -72,9 +72,9 @@ build-cross-glibc-startfiles: prepare-cross-glibc
 			  --disable-profile --enable-add-ons \
 			  $(shell echo '--with-tls' >/dev/null) ;\
 	}
-	[ -r ${CROSS_GLIBC_SRC_TREE}/$@/csu/crtn.o ] || { \
+	[ -r ${COMMON_GLIBC_SRC_TREE}/$@/csu/crtn.o ] || { \
 		printf '[%s] %s\n' $@ 'Build...' && \
-		cd ${CROSS_GLIBC_SRC_TREE}/$@ && \
+		cd ${COMMON_GLIBC_SRC_TREE}/$@ && \
 		make csu/subdir_lib ;\
 	}
 
@@ -84,7 +84,7 @@ build-cross-glibc-startfiles: prepare-cross-glibc
 install-cross-glibc-startfiles: build-cross-glibc-startfiles
 	[ -r ${TOOLCHAIN_DIR}/lib/libc.so ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
-		cd ${CROSS_GLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		cd ${COMMON_GLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make cross-compiling=yes install-bootstrap-headers=yes install-headers install_root=${TOOLCHAIN_DIR} && \
 		install -D bits/stdio_lim.h ${TOOLCHAIN_DIR}/usr/include/bits/stdio_lim.h && \
 		install -D ../include/gnu/stubs.h ${TOOLCHAIN_DIR}/usr/include/gnu/stubs.h && \
@@ -95,12 +95,12 @@ install-cross-glibc-startfiles: build-cross-glibc-startfiles
 
 .PHONY: build-cross-glibc-libc
 
-build-cross-glibc-libc: prepare-cross-glibc
+build-cross-glibc-libc: prepare-common-glibc
 	@printf '%s %s: %s\n' $(lastword ${MAKEFILE_LIST}) $@ "Reached at `date +'%X, %F'`"
-	mkdir -p ${CROSS_GLIBC_SRC_TREE}/$@
-	[ -r ${CROSS_GLIBC_SRC_TREE}/$@/config.status ] || { \
+	mkdir -p ${COMMON_GLIBC_SRC_TREE}/$@
+	[ -r ${COMMON_GLIBC_SRC_TREE}/$@/config.status ] || { \
 		printf '[%s] %s\n' $@ 'Configure...' && \
-		cd ${CROSS_GLIBC_SRC_TREE}/$@ && \
+		cd ${COMMON_GLIBC_SRC_TREE}/$@ && \
 		CC=${TARGET_TRIPLET}-kgcc \
 		  AS=${TARGET_TRIPLET}-kas \
 		  LD=${TARGET_TRIPLET}-kld \
@@ -117,9 +117,9 @@ build-cross-glibc-libc: prepare-cross-glibc
 			  --disable-profile --enable-add-ons \
 			  $(shell echo '--with-tls' >/dev/null) ;\
 	}
-	[ -r ${CROSS_GLIBC_SRC_TREE}/$@/csu/crtn.o ] || { \
+	[ -r ${COMMON_GLIBC_SRC_TREE}/$@/csu/crtn.o ] || { \
 		printf '[%s] %s\n' $@ 'Build...' && \
-		cd ${CROSS_GLIBC_SRC_TREE}/$@ && \
+		cd ${COMMON_GLIBC_SRC_TREE}/$@ && \
 		make ;\
 	}
 
@@ -127,9 +127,9 @@ build-cross-glibc-libc: prepare-cross-glibc
 .PHONY: install-cross-glibc-libc
 
 install-cross-glibc-libc: build-cross-glibc-libc
-	[ -r ${TOOLCHAIN_DIR}/lib/libc-${CROSS_GLIBC_VERSION}.so ] || { \
+	[ -r ${TOOLCHAIN_DIR}/lib/libc-${COMMON_GLIBC_VERSION}.so ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
-		cd ${CROSS_GLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		cd ${COMMON_GLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make install_root=${TOOLCHAIN_DIR} install ;\
 	}
 endif
@@ -140,7 +140,7 @@ ifeq (${PACKAGE_DESTINATION_RULES},target)
 
 ## [2025-07-03] 'build' empty - install copies sysroot's libs
 
-build-target-glibc: prepare-cross-glibc
+build-target-glibc: prepare-common-glibc
 	@printf '%s %s: %s\n' $(firstword ${MAKEFILE_LIST}) $@ "Reached at `date +'%X, %F'`"
 
 
