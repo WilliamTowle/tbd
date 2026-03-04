@@ -76,6 +76,6 @@ install-target-busybox: build-target-busybox
 	[ -r ${PACKAGE_DESTDIR}/bin/busybox ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
 		cd ${TARGET_BUSYBOX_SRC_TREE} && \
-		make install PREFIX=${PACKAGE_DESTDIR} ;\
+		make install CONFIG_PREFIX=${PACKAGE_DESTDIR} ;\
 	}
 endif
