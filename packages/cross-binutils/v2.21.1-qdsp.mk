@@ -2,6 +2,7 @@
 
 ## binutils -- www.gnu.org
 
+ifeq ($(filter cross-binutils,${ALL_PACKAGES}),)
 CROSS_BINUTILS_VERSION=2.21.1
 CROSS_BINUTILS_SRC_TARBALL=${DOWNLOAD_DIR}/b/binutils-${CROSS_BINUTILS_VERSION}.tar.bz2
 CROSS_BINUTILS_SRC_CHECKSUM=bde820eac53fa3a8d8696667418557ad
@@ -26,7 +27,6 @@ endif
 		}
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-toolchain-cross-binutils
 
 build-toolchain-cross-binutils: prepare-cross-binutils
@@ -63,4 +63,5 @@ install-toolchain-cross-binutils: build-toolchain-cross-binutils
 #		( cd ${CROSS_BINUTILS_SRC_TREE}/$(patsubst install-%,build-%,$@) && make install $(shell [ "`which makeinfo`" ] || echo 'MAKEINFO=/bin/true') ) ;\
 #		}
 #endif
+ALL_PACKAGES+=cross-binutils
 endif

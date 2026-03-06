@@ -1,7 +1,9 @@
-## TBD -- "Tiny By Design" musl package
+## TBD -- "Tiny By Design" uClibc-ng package
 
-## uclibc-ng -- https://uclibc-ng.org/
+## uclibc (versions to 0.9.33.2) -- https://uclibc.org/
+## uclibc-ng (versions from 1.0.0) -- https://uclibc-ng.org/
 
+ifeq ($(filter uclibc,${ALL_PACKAGES}),)
 COMMON_UCLIBC_VERSION=1.0.0
 COMMON_UCLIBC_SRC_TARBALL=${DOWNLOAD_DIR}/u/uClibc-ng-${COMMON_UCLIBC_VERSION}.tar.bz2
 COMMON_UCLIBC_SRC_CHECKSUM=98ab4861e63454942055873a73e9e50f
@@ -19,7 +21,6 @@ prepare-common-uclibc: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	}
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-cross-uclibc
 
 build-cross-uclibc: prepare-common-uclibc
@@ -60,10 +61,8 @@ install-cross-uclibc: build-cross-uclibc
 		cd ${COMMON_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make PREFIX=${TOOLCHAIN_DIR}'/' install_dev ;\
 	}
-endif
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-uclibc
 
 build-target-uclibc: prepare-common-uclibc
@@ -95,4 +94,5 @@ install-target-uclibc: build-target-uclibc
 			[ ! -e $(PACKAGE_DESTDIR)/lib/ld-uClibc.so.1 ] || ( cd $(PACKAGE_DESTDIR)/lib && ln -sf ld-uClibc.so.1 ld-uClibc.so.0 ) ;;\
 		esac ;\
 	}
+ALL_PACKAGES+=uclibc
 endif
