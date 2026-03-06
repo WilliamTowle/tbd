@@ -30,7 +30,6 @@ prepare-target-sbase: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	}
 
 
-#|ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-sbase
 
 build-target-sbase: prepare-target-sbase

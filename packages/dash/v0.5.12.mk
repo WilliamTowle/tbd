@@ -20,7 +20,6 @@ prepare-target-dash: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	}
 
 
-#|ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-dash
 
 build-target-dash: prepare-target-dash

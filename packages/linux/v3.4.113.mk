@@ -29,7 +29,6 @@ prepare-lxheaders: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	}
 
 
-#|ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-toolchain-lxheaders
 
 build-toolchain-lxheaders: prepare-lxheaders

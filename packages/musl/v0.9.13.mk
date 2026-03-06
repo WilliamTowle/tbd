@@ -41,7 +41,6 @@ prepare-common-musl: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	}
 
 
-#|ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-toolchain-cross-musl
 
 build-toolchain-cross-musl: prepare-common-musl
@@ -76,9 +75,7 @@ install-toolchain-cross-musl: build-toolchain-cross-musl
 			> ${TOOLCHAIN_DIR}/etc/ld-musl-${TARGET_CPU}.path && \
 		ln -sf ${TOOLCHAIN_DIR}/lib/libc.so ${TOOLCHAIN_DIR}/lib/ld-musl-${TARGET_CPU}.so.1 ;\
 		}
-#|endif
 
-#|ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-musl
 
 build-target-musl: prepare-common-musl

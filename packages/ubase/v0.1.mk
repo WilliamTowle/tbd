@@ -19,7 +19,6 @@ prepare-target-ubase: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	}
 
 
-#|ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-ubase
 
 build-target-ubase: prepare-target-ubase

@@ -3,6 +3,7 @@
 ## gcc -- www.gnu.org
 
 
+ifeq ($(filter cross-gcc,${ALL_PACKAGES}),)
 CROSS_GCC_VERSION=4.4.7
 CROSS_GCC_SRC_TARBALL=${DOWNLOAD_DIR}/g/gcc-${CROSS_GCC_VERSION}.tar.bz2
 CROSS_GCC_SRC_CHECKSUM=295709feb4441b04e87dea3f1bab4281
@@ -72,7 +73,6 @@ ifneq (${CROSS_GCC_MPFR_VERSION},)
 endif
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-toolchain-cross-kgcc
 
 build-toolchain-cross-kgcc: prepare-cross-gcc
@@ -203,4 +203,5 @@ install-cross-gcc: build-cross-gcc
 		cd ${TOOLCHAIN_DIR}/bin && \
 		ln -sf ${TARGET_TRIPLET}-gcc-${CROSS_GCC_VERSION} ${TARGET_TRIPLET}-gcc ;\
 		}
+ALL_PACKAGES+=cross-gcc
 endif

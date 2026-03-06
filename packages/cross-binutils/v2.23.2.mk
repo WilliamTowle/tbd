@@ -37,7 +37,6 @@ endif
 		}
 
 
-#|ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-toolchain-cross-binutils
 
 build-toolchain-cross-binutils: prepare-cross-binutils

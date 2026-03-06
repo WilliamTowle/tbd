@@ -87,7 +87,6 @@ ifneq (${CROSS_GCC_MPFR_VERSION},)
 endif
 
 
-#|ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-toolchain-cross-gcc
 
 build-toolchain-cross-gcc: prepare-cross-gcc

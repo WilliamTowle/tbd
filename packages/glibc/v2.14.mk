@@ -2,6 +2,7 @@
 
 ## glibc -- www.gnu.org
 
+ifeq ($(filter glibc,${ALL_PACKAGES}),)
 COMMON_GLIBC_VERSION=2.14
 COMMON_GLIBC_SRC_TARBALL=${DOWNLOAD_DIR}/g/glibc-${COMMON_GLIBC_VERSION}.tar.bz2
 COMMON_GLIBC_SRC_CHECKSUM= $(strip \
@@ -47,7 +48,6 @@ endif
 	}
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-cross-glibc-startfiles
 
 build-cross-glibc-startfiles: prepare-common-glibc
@@ -132,10 +132,8 @@ install-cross-glibc-libc: build-cross-glibc-libc
 		cd ${COMMON_GLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make install_root=${TOOLCHAIN_DIR} install ;\
 	}
-endif
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-glibc
 
 ## [2025-07-03] 'build' empty - install copies sysroot's libs
@@ -162,4 +160,5 @@ install-target-glibc: build-target-glibc
 				cp ${TOOLCHAIN_DIR}/lib/$${TCLIB} ${PACKAGE_DESTDIR}/lib64/ ;\
 			done ;\
 		}
+ALL_PACKAGES+=glibc
 endif
