@@ -3,6 +3,7 @@
 
 ## ubase "core - unportable tools" -- https://core.suckless.org/ubase/
 
+ifeq ($(filter ubase,${ALL_PACKAGES}),)
 TARGET_UBASE_VERSION=0.1
 TARGET_UBASE_SRC_TARBALL=${DOWNLOAD_DIR}/u/ubase-0.1.tar.gz
 TARGET_UBASE_SRC_CHECKSUM=38a7a1f1d66b53d4c55f17e01ee3fa44
@@ -18,7 +19,7 @@ prepare-target-ubase: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	}
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},target)
+#|ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-ubase
 
 build-target-ubase: prepare-target-ubase
@@ -46,4 +47,5 @@ install-target-ubase: build-target-ubase
 		cd ${TARGET_UBASE_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make install PREFIX=/ DESTDIR=${PACKAGE_DESTDIR} ;\
 		}
+ALL_PACKAGES+=ubase
 endif

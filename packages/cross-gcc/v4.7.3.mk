@@ -8,6 +8,7 @@
 
 # [2025-05-26] v4.2.x "build/genmodes: not found"
 
+ifeq ($(filter cross-gcc,${ALL_PACKAGES}),)
 CROSS_GCC_VERSION=4.7.3
 CROSS_GCC_SRC_TARBALL=${DOWNLOAD_DIR}/g/gcc-${CROSS_GCC_VERSION}.tar.bz2
 CROSS_GCC_SRC_CHECKSUM=86f428a30379bdee0224e353ee2f999e
@@ -86,7 +87,7 @@ ifneq (${CROSS_GCC_MPFR_VERSION},)
 endif
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
+#|ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-toolchain-cross-gcc
 
 build-toolchain-cross-gcc: prepare-cross-gcc
@@ -122,4 +123,5 @@ install-toolchain-cross-gcc: build-toolchain-cross-gcc
 		cd ${TOOLCHAIN_DIR}/bin && \
 		ln -sf ${TARGET_TRIPLET}-gcc-${CROSS_GCC_VERSION} ${TARGET_TRIPLET}-gcc ;\
 		}
+ALL_PACKAGES+=cross-gcc
 endif

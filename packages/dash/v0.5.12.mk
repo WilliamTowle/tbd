@@ -2,6 +2,7 @@
 
 ## dash (Debian Almquist Shell) -- http://gondor.apana.org.au/~herbert/dash/
 
+ifeq ($(filter dash,${ALL_PACKAGES}),)
 TARGET_DASH_VERSION=0.5.12
 TARGET_DASH_SRC_TARBALL=${DOWNLOAD_DIR}/d/dash-${TARGET_DASH_VERSION}.tar.gz
 TARGET_DASH_SRC_CHECKSUM=6800b5dbfbfdd43ac3df2ba9d31d0706
@@ -19,7 +20,7 @@ prepare-target-dash: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	}
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},target)
+#|ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-dash
 
 build-target-dash: prepare-target-dash
@@ -50,4 +51,5 @@ install-target-dash: build-target-dash
 		cd ${TARGET_DASH_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make install top_builddir=$$(pwd) DESTDIR=${PACKAGE_DESTDIR} ;\
 	}
+ALL_PACKAGES+=dash
 endif

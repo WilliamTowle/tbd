@@ -2,6 +2,7 @@
 
 ## linux kernel/headers -- kernel.org
 
+ifeq ($(filter linux,${ALL_PACKAGES}),)
 #TARGET_LINUX_VERSION=2.6.28
 #TARGET_LINUX_VERSION=3.2.4
 TARGET_LINUX_VERSION=3.4.113
@@ -15,7 +16,7 @@ TARGET_LINUX_SRC_CHECKSUM= $(strip \
 	)
 TARGET_LINUX_SRC_URL=https://mirrors.edge.kernel.org/pub/linux/kernel/v3.x/$(notdir ${TARGET_LINUX_SRC_TARBALL})
 
-TARGET_LINUX_SRC_TREE=${STAGING_DIR}/cross-linux-${TARGET_LINUX_VERSION}
+TARGET_LINUX_SRC_TREE=${STAGING_DIR}/build-linux-${TARGET_LINUX_VERSION}
 
 
 .PHONY: prepare-lxheaders
@@ -28,7 +29,7 @@ prepare-lxheaders: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	}
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
+#|ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-toolchain-lxheaders
 
 build-toolchain-lxheaders: prepare-lxheaders
@@ -49,4 +50,5 @@ install-toolchain-lxheaders: build-toolchain-lxheaders
 		LANG=C make ARCH=${TARGET_ARCH} \
 			INSTALL_HDR_PATH=${TOOLCHAIN_DIR}/${TARGET_TRIPLET} headers_install ;\
 		}
+ALL_PACKAGES+=linux
 endif

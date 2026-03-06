@@ -2,6 +2,7 @@
 
 ## sbase "core - userspace foundation" -- https://core.suckless.org/sbase/
 
+ifeq ($(filter sbase,${ALL_PACKAGES}),)
 TARGET_SBASE_VERSION=0.1
 TARGET_SBASE_SRC_TARBALL=${DOWNLOAD_DIR}/s/sbase-${TARGET_SBASE_VERSION}.tar.gz
 TARGET_SBASE_SRC_CHECKSUM=294eee10e8a2eb476452a0d60f391bd8
@@ -29,7 +30,7 @@ prepare-target-sbase: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	}
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},target)
+#|ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-sbase
 
 build-target-sbase: prepare-target-sbase
@@ -58,4 +59,5 @@ install-target-sbase: build-target-sbase
 		cd ${TARGET_SBASE_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make install PREFIX=/ DESTDIR=${PACKAGE_DESTDIR} ;\
 		}
+ALL_PACKAGES+=sbase
 endif

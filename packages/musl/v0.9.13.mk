@@ -8,6 +8,8 @@
 # ...v0.9 series ends with 0.9.15 (2014)
 # ...v0.8 ("beta") series ends with 0.8.10 (2012)
 # see musl-cross-make for patches addressing various CVEs
+
+ifeq ($(filter musl,${ALL_PACKAGES}),)
 COMMON_MUSL_VERSION=0.9.13
 #COMMON_MUSL_VERSION=1.0.5
 #COMMON_MUSL_VERSION=1.1.24
@@ -39,7 +41,7 @@ prepare-common-musl: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	}
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
+#|ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-toolchain-cross-musl
 
 build-toolchain-cross-musl: prepare-common-musl
@@ -74,9 +76,9 @@ install-toolchain-cross-musl: build-toolchain-cross-musl
 			> ${TOOLCHAIN_DIR}/etc/ld-musl-${TARGET_CPU}.path && \
 		ln -sf ${TOOLCHAIN_DIR}/lib/libc.so ${TOOLCHAIN_DIR}/lib/ld-musl-${TARGET_CPU}.so.1 ;\
 		}
-endif
+#|endif
 
-ifeq (${PACKAGE_DESTINATION_RULES},target)
+#|ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-musl
 
 build-target-musl: prepare-common-musl
@@ -106,4 +108,5 @@ install-target-musl: build-target-musl
 		cd ${COMMON_MUSL_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make install DESTDIR=${PACKAGE_DESTDIR} ;\
 		}
+ALL_PACKAGES+=musl
 endif

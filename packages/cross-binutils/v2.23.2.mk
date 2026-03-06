@@ -2,6 +2,7 @@
 
 ## binutils -- www.gnu.org
 
+ifeq ($(filter cross-binutils,${ALL_PACKAGES}),)
 # binutils 2.14 is c.2003 (2.14a and later from 2011); build fails
 # binutils 2.15-2.22 is c.2011
 # binutils 2.20.1 build fails
@@ -36,7 +37,7 @@ endif
 		}
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
+#|ifeq (${PACKAGE_DESTINATION_RULES},toolchain)
 .PHONY: build-toolchain-cross-binutils
 
 build-toolchain-cross-binutils: prepare-cross-binutils
@@ -79,4 +80,5 @@ install-toolchain-cross-binutils: build-toolchain-cross-binutils
 #		( cd ${CROSS_BINUTILS_SRC_TREE}/$(patsubst install-%,build-%,$@) && make install $(shell [ "`which makeinfo`" ] || echo 'MAKEINFO=/bin/true') ) ;\
 #		}
 #endif
+ALL_PACKAGES+=cross-binutils
 endif

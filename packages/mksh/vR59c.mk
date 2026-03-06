@@ -2,6 +2,7 @@
 
 ## mksh (MirBSD Korn Shell) -- http://www.mirbsd.org/mksh.htm
 
+ifeq ($(filter mksh,${ALL_PACKAGES}),)
 TARGET_MKSH_VERSION=R59c
 TARGET_MKSH_SRC_TARBALL=${DOWNLOAD_DIR}/m/mksh-${TARGET_MKSH_VERSION}.tgz
 TARGET_MKSH_SRC_CHECKSUM=99f8ac3c1d8a30b913d509f1969a4aaa
@@ -20,7 +21,6 @@ prepare-target-mksh: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 	@echo "[$@] TODO: configure (and build/install) mksh v${TARGET_MKSH_VERSION}"
 
 
-ifeq (${PACKAGE_DESTINATION_RULES},target)
 .PHONY: build-target-mksh
 
 build-target-mksh: prepare-target-mksh
@@ -41,4 +41,5 @@ install-target-mksh: build-target-mksh
 		mkdir -p ${PACKAGE_DESTDIR}/bin && \
 		cp mksh ${PACKAGE_DESTDIR}/bin/mksh ;\
 		}
+ALL_PACKAGES+=mksh
 endif
