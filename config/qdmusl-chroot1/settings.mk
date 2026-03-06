@@ -20,3 +20,4 @@ TARGET_TRIPLET=${TARGET_CPU}-custom-linux-${TARGET_LIBC}
 export PATH:=${TOOLCHAIN_DIR}/bin:${PATH}
 
 ALL_COMPONENTS=toolchain initrd
+ALL_PACKAGES=
