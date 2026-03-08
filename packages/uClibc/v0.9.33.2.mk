@@ -40,7 +40,7 @@ build-cross-uclibc-startfiles: prepare-common-uclibc
 		 \
 		 echo 'KERNEL_HEADERS="'${TOOLCHAIN_DIR}'/usr/include/"' ;\
 		 echo 'SHARED_LIB_LOADER_PREFIX="/lib"' ;\
-		 echo 'DEVEL_PREFIX="/"' ;\
+		 echo 'DEVEL_PREFIX="/usr"' ;\
 		 echo 'RUNTIME_PREFIX="/"' ;\
 		 \
 		 echo 'DO_C99_MATH=y' ;\
