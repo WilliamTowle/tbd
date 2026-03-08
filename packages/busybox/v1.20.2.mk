@@ -56,9 +56,9 @@ build-target-busybox: prepare-target-busybox
 			'CONFIG_ASH=y' \
 			'CONFIG_SH_IS_ASH=y' \
 			'# CONFIG_INETD is not set' \
-			'# CONFIG_IONICE is not set' \
 			'# CONFIG_NSLOOKUP is not set' \
-			'# CONFIG_PING is not set' \
+			'CONFIG_PING=y' \
+			'# CONFIG_PING6 is not set' \
 			'# CONFIG_TRACEROUTE is not set' \
 			 > .config && \
 		yes '' | make oldconfig ;\
