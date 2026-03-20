@@ -27,17 +27,27 @@ prepare-lxheaders: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 		printf '[%s] %s\n' $@ 'Extract...' && \
 		$(call extract_archive,$(TARGET_LINUX_SRC_TREE),$(TARGET_LINUX_SRC_TARBALL)) ;\
 	}
+	[ -r ${TARGET_LINUX_SRC_TREE}/Makefile.OLD ] || { \
+		cd ${TARGET_LINUX_SRC_TREE} && \
+		mv Makefile Makefile.OLD && \
+		cat Makefile.OLD \
+			| sed '/^ARCH/		s/?=.*/:= '${TARGET_ARCH}'/' \
+			| sed '/^CROSS_COMPILE/	s/?=.*/:= '${TARGET_TRIPLET}'-/' \
+		> Makefile ;\
+	}
 
 
 .PHONY: build-toolchain-lxheaders
 
 build-toolchain-lxheaders: prepare-lxheaders
-	[ -r ${TARGET_LINUX_SRC_TREE}/include/linux/version.h ] || { \
-		printf '[%s] %s\n' $@ 'Configure...' && \
-		cd ${TARGET_LINUX_SRC_TREE} && \
-		make mrproper && \
-		LANG=C make ARCH=${TARGET_ARCH} \
-			headers_check ;\
+	[ -r ${TARGET_LINUX_SRC_TREE}/$@/include/linux/version.h ] || { \
+		printf '[%s] %s\n' $@ 'Kernel headers check...' && \
+		mkdir -p ${TARGET_LINUX_SRC_TREE}/$@ &&\
+		cd ${TARGET_LINUX_SRC_TREE}/$@ &&\
+		make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
+			mrproper && \
+		LANG=C make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
+			headers_check ARCH=${TARGET_ARCH} ;\
 	}
 
 .PHONY: install-toolchain-lxheaders
@@ -45,9 +55,9 @@ build-toolchain-lxheaders: prepare-lxheaders
 install-toolchain-lxheaders: build-toolchain-lxheaders
 	[ -r ${TOOLCHAIN_DIR}/${TARGET_TRIPLET}/include/asm/.install ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
-		cd ${TARGET_LINUX_SRC_TREE} && \
-		LANG=C make ARCH=${TARGET_ARCH} \
-			INSTALL_HDR_PATH=${TOOLCHAIN_DIR}/${TARGET_TRIPLET} headers_install ;\
+		cd ${TARGET_LINUX_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		LANG=C make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
+			headers_install INSTALL_HDR_PATH=${TOOLCHAIN_DIR}/${TARGET_TRIPLET} ;\
 		}
 ALL_PACKAGES+=linux
 endif
