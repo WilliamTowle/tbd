@@ -56,7 +56,6 @@ prepare-lxheaders: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 
 build-toolchain-lxheaders: prepare-lxheaders
 	mkdir -p ${TARGET_LINUX_SRC_TREE}/$@
-	( cd ${TARGET_LINUX_SRC_TREE}/$@ && [ -r ./Makefile ] || ln -sf ../[A-Za-z]* ../.[a-z]* ./ )
 	[ -r ${TARGET_LINUX_SRC_TREE}/$@/include/linux/version.h ] || { \
 		printf '[%s] %s\n' $@ 'Build...' && \
 		cd ${TARGET_LINUX_SRC_TREE}/$@ && \
