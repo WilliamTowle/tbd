@@ -59,7 +59,7 @@ build-cross-uclibc-startfiles: prepare-common-uclibc
 .PHONY: install-cross-uclibc-startfiles
 
 install-cross-uclibc-startfiles: build-cross-uclibc-startfiles
-	[ -r ${TOOLCHAIN_DIR}/lib/crt1.o ] || { \
+	[ -r ${TOOLCHAIN_DIR}/usr/lib/crt1.o ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
 		cd ${COMMON_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make PREFIX=${TOOLCHAIN_DIR}'/usr/' install_headers && \
@@ -88,7 +88,7 @@ build-cross-uclibc-libc: prepare-common-uclibc
 .PHONY: install-cross-uclibc-libc
 
 install-cross-uclibc-libc: build-cross-uclibc-libc
-	[ -r ${TOOLCHAIN_DIR}/lib/libc.a ] || { \
+	[ -r ${TOOLCHAIN_DIR}/lib/libc.so.0 ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
 		cd ${COMMON_UCLIBC_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		make PREFIX=${TOOLCHAIN_DIR}'/' install ;\
