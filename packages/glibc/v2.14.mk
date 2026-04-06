@@ -23,6 +23,14 @@ endif
 		printf '[%s] %s\n' $@ 'Extract...' && \
 		$(call extract_archive,$(COMMON_GLIBC_SRC_TREE),$(COMMON_GLIBC_SRC_TARBALL)) ;\
 		cd ${COMMON_GLIBC_SRC_TREE} && \
+		case ${TARGET_CPU} in \
+		i386) \
+			printf '%s: %s\n' $(firstword ${MAKEFILE_LIST}) "Cannot configure for TARGET_CPU=${TARGET_CPU} - NPTL needs i486+" 1>&2 &&\
+			exit 1 ;;\
+		i[4-6]86) \
+			printf '%s\n' 'CFLAGS += -march=i486' \
+				> configparms ;;\
+		esac &&\
 		case ${COMMON_GLIBC_VERSION} in \
 		2.7) \
 			[ -r configure.OLD ] || mv configure configure.OLD ;\
@@ -30,8 +38,7 @@ endif
 				| sed '/3.79\*/ s/)$$/ | 4.3)/' \
 				| sed '/2.1\[/ s/)$$/ | 2.21*)/' \
 				> configure ;\
-			chmod a+x configure ;\
-			;; \
+			chmod a+x configure ;;\
 		2.14) \
 			[ -r configure.OLD ] || mv configure configure.OLD ;\
 			cat configure.OLD \
@@ -41,9 +48,7 @@ endif
 			[ -r sysdeps/i386/configure.OLD ] || mv sysdeps/i386/configure sysdeps/i386/configure.OLD ;\
 			cat sysdeps/i386/configure.OLD \
 				| sed '/"cpuid.h"/ { s/header_mongrel/header_compile/ ; s/ "[^"]*"$$// }' \
-				> sysdeps/i386/configure ;\
-			[ -r configure.OLD ] || mv configure configure.OLD ;\
-			;; \
+				> sysdeps/i386/configure ;;\
 		esac ;\
 	}
 
@@ -64,13 +69,11 @@ build-cross-glibc-startfiles: prepare-common-glibc
 			../configure \
 			  --prefix=/ \
 			  --includedir=/usr/include \
-				$(shell echo "--includedir=${TOOLCHAIN_DIR}/usr/include" >/dev/null) \
 			  --build=${HOST_TRIPLET} --host=${TARGET_TRIPLET} \
 			  --target=${TARGET_TRIPLET} \
 			  --with-headers=${TOOLCHAIN_DIR}/usr/include \
-			  --with-pkgversion='qdxtc' --enable-kernel=3.2.4 $(shell echo '--enable-kernel=2.6.28' >/dev/null) \
-			  --disable-profile --enable-add-ons \
-			  $(shell echo '--with-tls' >/dev/null) ;\
+			  --with-pkgversion='tbd' --enable-kernel=3.2.4 \
+			  --disable-profile --enable-add-ons ;\
 	}
 	[ -r ${COMMON_GLIBC_SRC_TREE}/$@/csu/crtn.o ] || { \
 		printf '[%s] %s\n' $@ 'Build...' && \
@@ -106,16 +109,15 @@ build-cross-glibc-libc: prepare-common-glibc
 		  LD=${TARGET_TRIPLET}-kld \
 		  libc_cv_forced_unwind=yes \
 		  libc_cv_c_cleanup=yes \
+		  libc_cv_slibdir=$(if $(filter i%86,${TARGET_CPU}),/lib,/lib64) \
 			../configure \
 			  --prefix=/ \
 			  --includedir=/usr/include \
-				$(shell echo "--includedir=${TOOLCHAIN_DIR}/usr/include" >/dev/null) \
 			  --build=${HOST_TRIPLET} --host=${TARGET_TRIPLET} \
 			  --target=${TARGET_TRIPLET} \
 			  --with-headers=${TOOLCHAIN_DIR}/usr/include \
-			  --with-pkgversion='qdxtc' --enable-kernel=3.2.4 $(shell echo '--enable-kernel=2.6.28' >/dev/null) \
-			  --disable-profile --enable-add-ons \
-			  $(shell echo '--with-tls' >/dev/null) ;\
+			  --with-pkgversion='tbd' --enable-kernel=3.2.4 \
+			  --disable-profile --enable-add-ons ;\
 	}
 	[ -r ${COMMON_GLIBC_SRC_TREE}/$@/csu/crtn.o ] || { \
 		printf '[%s] %s\n' $@ 'Build...' && \
@@ -145,20 +147,34 @@ build-target-glibc: prepare-common-glibc
 .PHONY: install-target-glibc
 
 install-target-glibc: build-target-glibc
-	[ -r ${PACKAGE_DESTDIR}/lib64/ld-linux-x86-64.so.2 ] || { \
+	[ -r ${PACKAGE_DESTDIR}/$(if $(filter i%86,${TARGET_CPU}),/lib/ld-linux.so.2,/lib64/ld-linux-x86-64.so.2) ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
-		mkdir -p ${PACKAGE_DESTDIR}/lib/ && \
-		for TCLIB in \
-			libc.so.* libm.so.* \
-			; do \
-				cp ${TOOLCHAIN_DIR}/lib/$${TCLIB} ${PACKAGE_DESTDIR}/lib/ ;\
-			done && \
-		mkdir -p ${PACKAGE_DESTDIR}/lib64/ && \
-		for TCLIB in \
-			ld*.so.* \
-			; do \
-				cp ${TOOLCHAIN_DIR}/lib/$${TCLIB} ${PACKAGE_DESTDIR}/lib64/ ;\
-			done ;\
+		case ${TARGET_CPU} in \
+		i*86)\
+			mkdir -p ${PACKAGE_DESTDIR}/lib/ &&\
+			for TCLIB in \
+				libc.so.* libm.so.* \
+				; do \
+					cp ${TOOLCHAIN_DIR}/lib/$${TCLIB} ${PACKAGE_DESTDIR}/lib/ ;\
+				done && \
+			for TCLIB in \
+				ld*.so.* \
+				; do \
+					cp ${TOOLCHAIN_DIR}/lib/$${TCLIB} ${PACKAGE_DESTDIR}/lib/ ;\
+				done ;;\
+		x86_64)\
+			mkdir -p ${PACKAGE_DESTDIR}/lib64/ &&\
+			for TCLIB in \
+				libc.so.* libm.so.* \
+				; do \
+					cp ${TOOLCHAIN_DIR}/lib64/$${TCLIB} ${PACKAGE_DESTDIR}/lib64/ ;\
+				done && \
+			for TCLIB in \
+				ld*.so.* \
+				; do \
+					cp ${TOOLCHAIN_DIR}/lib64/$${TCLIB} ${PACKAGE_DESTDIR}/lib64/ ;\
+				done ;;\
+		esac ;\
 		}
 ALL_PACKAGES+=glibc
 endif
