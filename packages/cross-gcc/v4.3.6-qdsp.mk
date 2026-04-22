@@ -47,7 +47,22 @@ endif
 		cd ${CROSS_GCC_SRC_TREE} && \
 		( [ -z "${CROSS_GCC_PATCH1_FILE}" ] || patch -Np1 -i ${CROSS_GCC_PATCH1_FILE} ) && \
 		case ${CROSS_GCC_VERSION} in \
-		4.2.*|4.3.*|4.4.*) \
+		4.3.*) \
+			cd ${CROSS_GCC_SRC_TREE} ;\
+			[ -r gcc/toplev.h.OLD ] || mv gcc/toplev.h gcc/toplev.h.OLD ;\
+			cat gcc/toplev.h.OLD \
+				| sed '/VERSION >= 3004/,/VERSION >= 3004/ { /^extern inline int/ s/^/#if 0\n/ ; /^}/ s/$$/\n#endif/ }' \
+				> gcc/toplev.h ;\
+			[ -r libiberty/regex.c.OLD ] || mv libiberty/regex.c libiberty/regex.c.OLD ;\
+			cat libiberty/regex.c.OLD \
+				| sed '/char \*realloc ();/ s/$$/\nvoid abort(void);\nvoid free(void *);/' \
+				> libiberty/regex.c ;\
+			[ -r libiberty/md5.c.OLD ] || mv libiberty/md5.c libiberty/md5.c.OLD ;\
+			cat libiberty/md5.c.OLD \
+				| sed '/define memcpy/ s/$$/\n#else#\nvoid *memcpy(void *,const void *,size_t);/' \
+				> libiberty/md5.c \
+		;; \
+		4.4.*) \
 			cd ${CROSS_GCC_SRC_TREE} ;\
 			[ -r gcc/toplev.h.OLD ] || mv gcc/toplev.h gcc/toplev.h.OLD ;\
 			cat gcc/toplev.h.OLD \
@@ -60,6 +75,19 @@ ifneq (${CROSS_GCC_GMP_VERSION},)
 	[ -r ${CROSS_GCC_SRC_TREE}/gmp/README ] || { \
 		$(call extract_archive,$(CROSS_GCC_SRC_TREE)/gmp,$(CROSS_GCC_GMP_SRC_TARBALL)) ;\
 		}
+	case ${CROSS_GCC_GMP_VERSION} in \
+	4.3.2) \
+		cd ${CROSS_GCC_SRC_TREE}/gmp &&\
+		[ -r acinclude.m4.OLD ] || mv acinclude.m4 acinclude.m4.OLD ;\
+		cat acinclude.m4.OLD \
+			| sed '/GMP_PROG_CC_FOR_BUILD$$/,/^EOF$$/ { /<<EOF$$/ s/$$/\n\#include <stdlib.h>/ }' \
+			| sed '/GMP_PROG_EXEEXT_FOR_BUILD$$/,/^EOF$$/ { /<<EOF$$/ s/$$/\n\#include <stdlib.h>/ }' \
+			| sed '/GMP_C_FOR_BUILD_ANSI$$/,/^EOF$$/ { /<<EOF$$/ s/$$/\n\#include <stdlib.h>/ }' \
+			| sed '/GMP_CHECK_LIBM_FOR_BUILD$$/,/^EOF$$/ { /<<EOF$$/ s/$$/\n\#include <stdlib.h>\n\#include <math.h>/ }' \
+			> acinclude.m4 && \
+		autoconf \
+	;; \
+	esac
 endif
 ifneq (${CROSS_GCC_MPC_VERSION},)
 	[ -r ${CROSS_GCC_SRC_TREE}/mpc/README ] || { \
@@ -81,7 +109,8 @@ build-cross-gcc: prepare-cross-gcc
 	[ -r ${CROSS_GCC_SRC_TREE}/$@/config.log ] || { \
 		printf '[%s] %s\n' $@ 'Configure...' && \
 		cd ${CROSS_GCC_SRC_TREE}/$@ && \
-		../configure --prefix=${TOOLCHAIN_DIR} \
+		CFLAGS='-fpermissive' \
+		  ../configure --prefix=${TOOLCHAIN_DIR} \
 		  --build=${HOST_TRIPLET} --host=${HOST_TRIPLET} --target=${TARGET_TRIPLET} \
 		  --with-sysroot=${TOOLCHAIN_DIR} --disable-nls  --disable-shared \
 		  --without-headers --with-newlib \
