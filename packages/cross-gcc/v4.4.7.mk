@@ -11,8 +11,8 @@ CROSS_GCC_SRC_URL=https://ftp.gnu.org/gnu/gcc/gcc-${CROSS_GCC_VERSION}/$(notdir 
 CROSS_GCC_SRC_TREE=${STAGING_DIR}/build-gcc-${CROSS_GCC_VERSION}
 
 
-#ifneq ($(filter 4.3.%,${CROSS_GCC_VERSION}),)
-# [gcc 4.3.x] "Building GCC requires GMP 4.1+ and MPFR 2.3.0+."
+ifneq ($(filter 4.4.%,${CROSS_GCC_VERSION}),)
+# [gcc 4.4.7] "Building GCC requires GMP 4.1+ and MPFR 2.3.2+".
 CROSS_GCC_GMP_VERSION=4.3.2
 CROSS_GCC_GMP_SRC_TARBALL=${DOWNLOAD_DIR}/g/gmp-${CROSS_GCC_GMP_VERSION}.tar.gz
 CROSS_GCC_GMP_SRC_CHECKSUM=2a431d487dfd76d0f618d241b1e551cc
@@ -22,7 +22,7 @@ CROSS_GCC_MPFR_VERSION=2.4.2
 CROSS_GCC_MPFR_SRC_TARBALL=${DOWNLOAD_DIR}/m/mpfr-${CROSS_GCC_MPFR_VERSION}.tar.bz2
 CROSS_GCC_MPFR_SRC_CHECKSUM=89e59fe665e2b3ad44a6789f40b059a0
 CROSS_GCC_MPFR_SRC_URL=https://ftp.gnu.org/gnu/mpfr/$(notdir ${CROSS_GCC_MPFR_SRC_TARBALL})
-#endif	# 4.3.x dependencies
+endif	# 4.4.x dependencies
 
 
 .PHONY: prepare-cross-gcc
@@ -47,12 +47,20 @@ endif
 		cd ${CROSS_GCC_SRC_TREE} && \
 		( [ -z "${CROSS_GCC_PATCH1_FILE}" ] || patch -Np1 -i ${CROSS_GCC_PATCH1_FILE} ) && \
 		case ${CROSS_GCC_VERSION} in \
-		4.2.*|4.3.*|4.4.*) \
+		4.4.*) \
 			cd ${CROSS_GCC_SRC_TREE} ;\
 			[ -r gcc/toplev.h.OLD ] || mv gcc/toplev.h gcc/toplev.h.OLD ;\
 			cat gcc/toplev.h.OLD \
-				| sed '/VERSION >= 3004/,/VERSION >= 3004/ { /^extern inline int/ s/^/#if 0\n/ ; /^}/ s/$$/\n#endif/ }' \
-				> gcc/toplev.h \
+				| sed '/VERSION >= 3004/,/VERSION >= 3004/ { /^extern inline int/ s/^/\#if 0\n/ ; /^}/ s/$$/\n\#endif/ }' \
+				> gcc/toplev.h ;\
+			[ -r libiberty/regex.c.OLD ] || mv libiberty/regex.c libiberty/regex.c.OLD ;\
+			cat libiberty/regex.c.OLD \
+				| sed '/char \*realloc ();/ s/$$/\nvoid abort(void);\nvoid free(void *);/' \
+				> libiberty/regex.c ;\
+			[ -r libiberty/md5.c.OLD ] || mv libiberty/md5.c libiberty/md5.c.OLD ;\
+			cat libiberty/md5.c.OLD \
+				| sed '/define memcpy/ s/$$/\n#else#\nvoid *memcpy(void *,const void *,size_t);/' \
+				> libiberty/md5.c \
 		;; \
 		esac ;\
 		}
@@ -60,6 +68,19 @@ ifneq (${CROSS_GCC_GMP_VERSION},)
 	[ -r ${CROSS_GCC_SRC_TREE}/gmp/README ] || { \
 		$(call extract_archive,$(CROSS_GCC_SRC_TREE)/gmp,$(CROSS_GCC_GMP_SRC_TARBALL)) ;\
 		}
+	case ${CROSS_GCC_GMP_VERSION} in \
+	4.3.2) \
+		cd ${CROSS_GCC_SRC_TREE}/gmp &&\
+		[ -r acinclude.m4.OLD ] || mv acinclude.m4 acinclude.m4.OLD ;\
+		cat acinclude.m4.OLD \
+			| sed '/GMP_PROG_CC_FOR_BUILD$$/,/^EOF$$/ { /<<EOF$$/ s/$$/\n\#include <stdlib.h>/ }' \
+			| sed '/GMP_PROG_EXEEXT_FOR_BUILD$$/,/^EOF$$/ { /<<EOF$$/ s/$$/\n\#include <stdlib.h>/ }' \
+			| sed '/GMP_C_FOR_BUILD_ANSI$$/,/^EOF$$/ { /<<EOF$$/ s/$$/\n\#include <stdlib.h>/ }' \
+			| sed '/GMP_CHECK_LIBM_FOR_BUILD$$/,/^EOF$$/ { /<<EOF$$/ s/$$/\n\#include <stdlib.h>\n\#include <math.h>/ }' \
+			> acinclude.m4 && \
+		autoconf \
+	;; \
+	esac
 endif
 ifneq (${CROSS_GCC_MPC_VERSION},)
 	[ -r ${CROSS_GCC_SRC_TREE}/mpc/README ] || { \
