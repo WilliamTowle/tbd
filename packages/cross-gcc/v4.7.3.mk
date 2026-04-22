@@ -74,6 +74,19 @@ ifneq (${CROSS_GCC_GMP_VERSION},)
 	[ -r ${CROSS_GCC_SRC_TREE}/gmp/README ] || { \
 		$(call extract_archive,$(CROSS_GCC_SRC_TREE)/gmp,$(CROSS_GCC_GMP_SRC_TARBALL)) ;\
 		}
+	case ${CROSS_GCC_GMP_VERSION} in \
+	4.3.2) \
+		cd ${CROSS_GCC_SRC_TREE}/gmp &&\
+		[ -r acinclude.m4.OLD ] || mv acinclude.m4 acinclude.m4.OLD ;\
+		cat acinclude.m4.OLD \
+			| sed '/GMP_PROG_CC_FOR_BUILD$$/,/^EOF$$/ { /<<EOF$$/ s/$$/\n\#include <stdlib.h>/ }' \
+			| sed '/GMP_PROG_EXEEXT_FOR_BUILD$$/,/^EOF$$/ { /<<EOF$$/ s/$$/\n\#include <stdlib.h>/ }' \
+			| sed '/GMP_C_FOR_BUILD_ANSI$$/,/^EOF$$/ { /<<EOF$$/ s/$$/\n\#include <stdlib.h>/ }' \
+			| sed '/GMP_CHECK_LIBM_FOR_BUILD$$/,/^EOF$$/ { /<<EOF$$/ s/$$/\n\#include <stdlib.h>\n\#include <math.h>/ }' \
+			> acinclude.m4 && \
+		autoconf \
+	;; \
+	esac
 endif
 ifneq (${CROSS_GCC_MPC_VERSION},)
 	[ -r ${CROSS_GCC_SRC_TREE}/mpc/README ] || { \
@@ -94,6 +107,7 @@ build-toolchain-cross-gcc: prepare-cross-gcc
 	[ -r ${CROSS_GCC_SRC_TREE}/$@/config.log ] || { \
 		printf '[%s] %s\n' $@ 'Configure...' && \
 		cd ${CROSS_GCC_SRC_TREE}/$@ && \
+		CFLAGS='-fpermissive' \
 		../configure \
 			--prefix=${TOOLCHAIN_DIR} \
 			--build=${HOST_TRIPLET} --host=${HOST_TRIPLET} \
@@ -103,7 +117,8 @@ build-toolchain-cross-gcc: prepare-cross-gcc
 			--disable-decimal-float --disable-libgomp \
 			--disable-libmudflap \
 			--disable-libquadmath \
-			--disable-libssp --disable-threads --enable-languages=c \
+			--disable-libssp --disable-threads \
+			--enable-languages=c --enable-clocale=musl --disable-__cxa_atexit \
 			--disable-multilib ;\
 		}
 	[ -r ${CROSS_GCC_SRC_TREE}/$@/gcc/include-fixed/README ] || { \
