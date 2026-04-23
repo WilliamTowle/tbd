@@ -91,7 +91,7 @@ build-target-musl: prepare-common-musl
 			--includedir=/usr/include \
 			--disable-gcc-wrapper ;\
 		}
-	[ -r ${TARGET_ROOTFS}/lib/ld-musl-${TARGET_CPU}.so.1 ] || { \
+	[ -r ${COMMON_MUSL_SRC_TREE}/$@/src/ldso/start.lo ] || { \
 		printf '[%s] %s\n' $@ 'Build...' && \
 		cd ${COMMON_MUSL_SRC_TREE}/$@ && \
 		make ;\
