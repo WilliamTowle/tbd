@@ -1,28 +1,25 @@
 # TBD -- "Tiny By Design" package common build rules
 
+include ${CONFIG_DIR}/toolchain.mk
+include ${CONFIG_DIR}/rootfs.mk
 
 ${DOWNLOAD_DIR}: ; @mkdir -p $@
 
 ${STAGING_DIR}: ; @mkdir -p $@
 
-${TOOLCHAIN_DIR}: ; @mkdir -p $@
-
 
 ##
 
-.PHONY: all $(patsubst %,all-%,${ALL_COMPONENTS})
-
-$(patsubst %,all-%,${ALL_COMPONENTS}): all-%:
-	make -f ${CONFIG_DIR}/$*.mk $@
+.PHONY: all
 
 all: $(patsubst %,all-%,${ALL_COMPONENTS})
 
-#
 
-.PHONY: clean distclean
+# clean/distclean
+#
+# Common cleaning here - component-specific rules may also apply
 
 clean::
-	-rm -rf ${TOOLCHAIN_DIR}
 	-rm -rf ${STAGING_DIR}
 
 
