@@ -1,14 +1,21 @@
 ## TBD -- "Tiny By Design" toolchain component
 
-include ${CONFIG_DIR}/settings.mk
--include ${CONFIG_DIR}/functions.mk
--include ${CONFIG_DIR}/rules.mk
 
+# packages
+
+-include ${CONFIG_DIR}/functions.mk
 
 include ${PACKAGE_DIR}/cross-binutils/v2.21.1.mk
 include ${PACKAGE_DIR}/cross-gcc/v4.3.6.mk
 include ${PACKAGE_DIR}/linux/v3.4.113-nbl.mk
 include ${PACKAGE_DIR}/uClibc/v0.9.33.2.mk
+
+#
+
+${TOOLCHAIN_DIR}: ; @mkdir -p $@
+
+
+.PHONY: all-toolchain
 
 all-toolchain: \
 	install-toolchain-cross-binutils \
@@ -20,7 +27,19 @@ all-toolchain: \
 	install-cross-gcc
 	@printf '[toolchain %s] %s\n' $@ "Done at `date +'%F, %X'`"
 
+#
+
+.PHONY: clean-toolchain
+
 clean-toolchain:
 	-rm -rf ${TOOLCHAIN_DIR}
 
-distclean-toolchain:
+
+.PHONY: distclean-toolchain
+
+distclean-toolchain: clean-toolchain
+
+
+clean:: clean-toolchain
+
+distclean:: distclean-toolchain
