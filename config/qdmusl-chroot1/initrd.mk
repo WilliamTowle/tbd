@@ -13,18 +13,48 @@ include ${PACKAGE_DIR}/ubase/v0.1.mk
 
 #
 
-PACKAGE_DESTDIR=${STAGING_DIR}/initrd
+INITRD_STAGING_DIR=${STAGING_DIR}/initrd
+INITRD_MEDIA_TYPE=cpio
+INITRD_PACKAGES=musl dash sbase ubase
+
+
+${INITRD_STAGING_DIR}: ; mkdir -p $@
 
 
 .PHONY: all-initrd
 
-all-initrd: \
-	all-toolchain \
-	install-target-musl \
-	install-target-dash \
-	install-target-sbase \
-	install-target-ubase
-	( cd ${STAGING_DIR}/initrd && find . | cpio -o -H newc -R root:root | gzip -9 ) > ${STAGING_DIR}/initrd.gz
+
+.PHONY: prepare-initrd-staging
+
+prepare-initrd-staging: \
+		all-toolchain \
+		$(patsubst %,build-target-%,${INITRD_PACKAGES}) \
+		| ${STAGING_DIR}
+
+
+.PHONY: install-initrd-cpio
+
+install-initrd-cpio: PACKAGE_DESTDIR=${INITRD_STAGING_DIR}
+
+install-initrd-cpio: \
+		prepare-initrd-staging \
+		$(patsubst %,install-target-%,${INITRD_PACKAGES}) \
+		| ${INITRD_STAGING_DIR}
+	( cd ${INITRD_STAGING_DIR} && find . | cpio -o -H newc -R root:root | gzip -9 ) > ${INITRD_STAGING_DIR}.gz
+
+
+.PHONY: install-initrd-squashfs
+
+install-initrd-squashfs: PACKAGE_DESTDIR=${INITRD_STAGING_DIR}
+
+install-initrd-squashfs: \
+		prepare-initrd-staging \
+		$(patsubst %,install-target-%,${INITRD_PACKAGES}) \
+		| ${INITRD_STAGING_DIR}
+	( cd ${INITRD_STAGING_DIR} && /usr/bin/mksquashfs . ${INITRD_STAGING_DIR}.squashfs -noappend -all-root -nopad )
+
+
+all-initrd: install-initrd-${INITRD_MEDIA_TYPE}
 	@printf '[initrd %s] %s\n' $@ "Done at `date +'%F, %X'`"
 
 #
@@ -32,8 +62,8 @@ all-initrd: \
 .PHONY: clean-initrd distclean-initrd
 
 clean-initrd:
-	-rm -f ${STAGING_DIR}/initrd.gz
-	-rm -rf ${STAGING_DIR}/initrd
+	-rm -f ${INITRD_STAGING_DIR}.gz ${INITRD_STAGING_DIR}.squashfs
+	-rm -rf ${INITRD_STAGING_DIR}
 
 distclean-initrd: clean-initrd
 
