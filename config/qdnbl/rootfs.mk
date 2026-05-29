@@ -1,7 +1,9 @@
 ## TBD -- "Tiny By Design" rootfs component
 
+include ${PACKAGE_DIR}/busybox/v1.20.2.mk
+include ${PACKAGE_DIR}/uClibc/v0.9.33.2-qdnbl.mk
 
-ROOTFS_PACKAGES=
+ROOTFS_PACKAGES=busybox uclibc
 ROOTFS_PACKAGES_DIR=${STAGING_DIR}/rootfs-packages
 ROOTFS_STAGING_DIR=${STAGING_DIR}/rootfs
 
