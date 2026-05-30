@@ -8,7 +8,7 @@
 include ${PACKAGE_DIR}/linux/v3.4.113.mk
 include ${PACKAGE_DIR}/cross-binutils/v2.23.2.mk
 include ${PACKAGE_DIR}/cross-gcc/v4.7.3.mk
-include ${PACKAGE_DIR}/musl/v0.9.13.mk
+include ${PACKAGE_DIR}/musl/v0.9.15.mk
 
 #
 
