@@ -103,7 +103,7 @@ build-toolchain-cross-kgcc: prepare-cross-gcc
 		cd ${CROSS_GCC_SRC_TREE}/$@ && \
 		  ../configure \
 			--prefix=${TOOLCHAIN_DIR} \
-			--program-transform-name='s%^%'${TARGET_TRIPLET}'-k%' \
+			--program-transform-name='s%^%'${TARGET_CPU}-${TARGET_VENDOR}'-linux-none-%' \
 			--build=${HOST_TRIPLET} --host=${HOST_TRIPLET} \
 			--target=${TARGET_TRIPLET} \
 			--with-sysroot=${TOOLCHAIN_DIR} \
@@ -145,7 +145,7 @@ build-cross-libgcc: prepare-cross-gcc
 		CFLAGS='-fpermissive' \
 		  ../configure \
 			--prefix=${TOOLCHAIN_DIR} \
-			--program-transform-name='s%^%'${TARGET_TRIPLET}'-k%' \
+			--program-transform-name='s%^%'${TARGET_CPU}-${TARGET_VENDOR}'-linux-none-%' \
 			--build=${HOST_TRIPLET} --host=${HOST_TRIPLET} \
 			--target=${TARGET_TRIPLET} \
 			--with-sysroot=${TOOLCHAIN_DIR} \
@@ -164,7 +164,7 @@ build-cross-libgcc: prepare-cross-gcc
 	[ -r ${CROSS_GCC_SRC_TREE}/$@/gcc/libgcc.a ] || { \
 		printf '[%s] %s\n' $@ 'Build...' && \
 		cd ${CROSS_GCC_SRC_TREE}/$@ && \
-		make $(shell echo 'enable_shared=no' >/dev/null) all-target-libgcc ;\
+		make all-target-libgcc ;\
 		}
 
 
@@ -189,11 +189,10 @@ build-cross-gcc: prepare-cross-gcc
 		CFLAGS='-fpermissive' \
 		  ../configure \
 			--prefix=${TOOLCHAIN_DIR} \
-			--program-transform-name='s%^%'${TARGET_TRIPLET}'%' \
+			--program-transform-name='s%^%'${TARGET_TRIPLET}-'%' \
 			--build=${HOST_TRIPLET} --host=${HOST_TRIPLET} \
 			--target=${TARGET_TRIPLET} \
 			--with-sysroot=${TOOLCHAIN_DIR} \
-			$(shell echo "--with-headers=${TOOLCHAIN_DIR}/usr/include" >/dev/null) \
 			--disable-multilib \
 			--disable-shared \
 			--disable-threads \
