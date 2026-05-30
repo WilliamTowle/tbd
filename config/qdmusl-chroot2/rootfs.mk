@@ -5,7 +5,7 @@
 
 -include ${CONFIG_DIR}/functions.mk
 
-include ${PACKAGE_DIR}/musl/v0.9.13.mk
+include ${PACKAGE_DIR}/musl/v0.9.15.mk
 include ${PACKAGE_DIR}/dash/v0.5.12.mk
 include ${PACKAGE_DIR}/mksh/vR59c.mk
 
