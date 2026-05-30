@@ -13,8 +13,9 @@ HOST_TRIPLET=$(shell gcc -dumpmachine | sed 's/^\([^-]*\).*-\([^-]*-[^-]*.\)$$/\
 #TARGET_CPU=i686
 TARGET_CPU=$(shell uname -m)
 TARGET_ARCH=$(shell echo ${TARGET_CPU} | sed 's/i[4-6]86/i386/' )
+TARGET_VENDOR=qduclibc
 TARGET_LIBC=uclibc
-TARGET_TRIPLET=${TARGET_CPU}-custom-linux-${TARGET_LIBC}
+TARGET_TRIPLET=${TARGET_CPU}-${TARGET_VENDOR}-linux-${TARGET_LIBC}
 
 
 export PATH:=${TOOLCHAIN_DIR}/bin:${PATH}
