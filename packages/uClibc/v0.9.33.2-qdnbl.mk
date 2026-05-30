@@ -36,7 +36,7 @@ build-cross-uclibc-startfiles: prepare-common-uclibc
 		( \
 		 echo 'TOOLCHAIN_ARCH="'${TARGET_ARCH}'"' ;\
 		 echo 'TARGET_'${TARGET_ARCH}'=y' ;\
-		 echo 'CROSS_COMPILER_PREFIX="'${TARGET_TRIPLET}'-k"' ;\
+		 echo 'CROSS_COMPILER_PREFIX="'${TARGET_CPU}-${TARGET_VENDOR}-linux-none-'"' ;\
 		 \
 		 echo 'KERNEL_HEADERS="'${TOOLCHAIN_DIR}'/usr/include/"' ;\
 		 echo 'SHARED_LIB_LOADER_PREFIX="/lib"' ;\
