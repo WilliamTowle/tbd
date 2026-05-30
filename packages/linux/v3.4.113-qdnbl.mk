@@ -32,7 +32,7 @@ prepare-lxheaders: | ${DOWNLOAD_DIR} ${STAGING_DIR}
 		{ [ -r Makefile.OLD ] || mv Makefile Makefile.OLD ; } && \
 		cat Makefile.OLD \
 			| sed '/^ARCH/		s/?=.*/:= '${TARGET_ARCH}'/' \
-			| sed '/^CROSS_COMPILE/	s/?=.*/:= '${TARGET_TRIPLET}'-k/' \
+			| sed '/^CROSS_COMPILE/	s/?=.*/:= '${TARGET_CPU}'-'${TARGET_VENDOR}'-linux-none-/' \
 		> Makefile ;\
 	}
 	[ -r ${TARGET_LINUX_SRC_TREE}/$@/.config ] || { \
