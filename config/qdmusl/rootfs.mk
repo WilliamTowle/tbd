@@ -1,7 +1,9 @@
 ## TBD -- "Tiny By Design" rootfs component
 
+include ${PACKAGE_DIR}/busybox/v1.24.2.mk
+include ${PACKAGE_DIR}/musl/v0.9.15.mk
 
-ROOTFS_PACKAGES=
+ROOTFS_PACKAGES=musl busybox
 ROOTFS_PACKAGES_DIR=${STAGING_DIR}/rootfs-packages
 ROOTFS_STAGING_DIR=${STAGING_DIR}/rootfs
 
