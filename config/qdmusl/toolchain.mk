@@ -1,6 +1,15 @@
 ## TBD -- "Tiny By Design" toolchain component
 
-TOOLCHAIN_PACKAGES=
+include ${PACKAGE_DIR}/linux/v3.4.113.mk
+include ${PACKAGE_DIR}/cross-binutils/v2.23.2.mk
+include ${PACKAGE_DIR}/cross-gcc/v4.7.3.mk
+include ${PACKAGE_DIR}/musl/v0.9.15.mk
+
+TOOLCHAIN_PACKAGES= \
+		toolchain-lxheaders \
+		toolchain-cross-binutils \
+		toolchain-cross-gcc \
+		toolchain-cross-musl
 
 ifneq (${TOOLCHAIN_PACKAGES},)
 include ${CONFIG_DIR}/functions.mk
