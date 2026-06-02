@@ -1,7 +1,9 @@
 ## TBD -- "Tiny By Design" rootfs component
 
+include ${PACKAGE_DIR}/busybox/v1.20.2.mk
+include ${PACKAGE_DIR}/glibc/v2.14-qdglibc.mk
 
-ROOTFS_PACKAGES=
+ROOTFS_PACKAGES=glibc busybox
 ROOTFS_PACKAGES_DIR=${STAGING_DIR}/rootfs-packages
 ROOTFS_STAGING_DIR=${STAGING_DIR}/rootfs
 
