@@ -59,5 +59,53 @@ install-toolchain-lxheaders: build-toolchain-lxheaders
 		LANG=C make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
 			headers_install INSTALL_HDR_PATH=${TOOLCHAIN_DIR}/usr ;\
 		}
+
+#
+
+.PHONY: build-target-lximage
+build-target-lximage: \
+		all-toolchain \
+		prepare-lxheaders
+	mkdir -p ${TARGET_LINUX_SRC_TREE}/$@
+	[ -r ${TARGET_LINUX_SRC_TREE}/$@/.config ] || { \
+		cd ${TARGET_LINUX_SRC_TREE}/$@ && \
+		make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
+			mrproper ARCH=${TARGET_ARCH} && \
+		mkdir scripts &&\
+		cp ${TARGET_LINUX_SRC_TREE}/scripts/config ./scripts &&\
+		make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
+			${TARGET_ARCH}_defconfig &&\
+		scripts/config --enable BLK_DEV_INITRD &&\
+		scripts/config --enable CONFIG_EFI \
+				--enable CONFIG_EFI_STUB \
+				--enable CONFIG_EFI_MIXED &&\
+		scripts/config --enable IKCONFIG --enable IKCONFIG_PROC && \
+		scripts/config --enable DEVTMPFS --enable DEVTMPFS_MOUNT --enable TMPFS && \
+		scripts/config --enable MODULES && \
+		scripts/config --set-str CONFIG_LOCALVERSION '-tbd' && \
+		\
+		./scripts/config --enable EXT2_FS && \
+		yes '' | make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
+				oldconfig ARCH=${TARGET_ARCH} ;\
+	}
+	[ -r arch/${TARGET_ARCH}/boot/bzImage ] || { \
+		printf '[%s] %s\n' $@ 'Build...' && \
+		cd ${TARGET_LINUX_SRC_TREE}/$@ && \
+		make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
+			bzImage \
+			ARCH=${TARGET_ARCH} KBUILD_VERBOSE=1 ;\
+	}
+
+
+.PHONY: install-target-lximage
+
+install-target-lximage: \
+		build-target-lximage
+	[ -r ${PACKAGE_DESTDIR}/boot/bzImage ] || { \
+		cd ${TARGET_LINUX_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		mkdir -p ${PACKAGE_DESTDIR}/boot &&\
+		cp arch/x86/boot/bzImage ${PACKAGE_DESTDIR}/boot ;\
+	}
+
 ALL_PACKAGES+=linux
 endif
