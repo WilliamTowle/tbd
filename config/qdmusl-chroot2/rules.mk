@@ -15,7 +15,7 @@ ${STAGING_DIR}: ; @mkdir -p $@
 
 .PHONY: all
 
-all: $(patsubst %,all-%,${ALL_COMPONENTS})
+all: $(addprefix all-,${ALL_COMPONENTS})
 
 # clean/distclean
 #

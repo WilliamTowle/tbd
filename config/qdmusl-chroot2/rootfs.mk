@@ -3,11 +3,19 @@
 
 # packages
 
--include ${CONFIG_DIR}/functions.mk
-
-include ${PACKAGE_DIR}/musl/v0.9.15.mk
 include ${PACKAGE_DIR}/dash/v0.5.12.mk
 include ${PACKAGE_DIR}/mksh/vR59c.mk
+include ${PACKAGE_DIR}/musl/v0.9.15.mk
+
+ROOTFS_PACKAGES= \
+	target-musl \
+	target-dash \
+	target-mksh
+
+ifneq (${ROOTFS_PACKAGES},)
+-include ${CONFIG_DIR}/functions.mk
+endif
+
 
 #
 
@@ -18,10 +26,8 @@ PACKAGE_DESTDIR=${STAGING_DIR}/rootfs
 
 all-rootfs: \
 	all-toolchain \
-	install-target-musl \
-	install-target-dash \
-	install-target-mksh
-	@printf '[rootfs %s] %s\n' $@ "Done at `date +'%F, %X'`"
+	$(addprefix install-,${ROOTFS_PACKAGES})
+	@printf '[rootfs %s] %s\n' $@ "Done (built $(words ${ROOTFS_PACKAGES})) at `date +'%F, %X'`"
 
 #
 
