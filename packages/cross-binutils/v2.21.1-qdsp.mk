@@ -52,16 +52,9 @@ build-toolchain-cross-binutils: prepare-cross-binutils
 .PHONY: install-toolchain-cross-binutils
 
 install-toolchain-cross-binutils: build-toolchain-cross-binutils
-#ifeq ($(filter-out 4.2%,${CROSS_GCC_VERSION}),)	# specific point releases
 	[ -r ${TOOLCHAIN_DIR}/bin/${TARGET_TRIPLET}-ld ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
 		( cd ${CROSS_BINUTILS_SRC_TREE}/$(patsubst install-%,build-%,$@) && make install $(shell [ "`which makeinfo`" ] || echo 'MAKEINFO=/bin/true') ) ;\
 		}
-#else
-#	[ -r ${TOOLCHAIN_DIR}/bin/${TARGET_TRIPLET}-kld ] || { \
-#		printf '[%s] %s\n' $@ 'Install...' && \
-#		( cd ${CROSS_BINUTILS_SRC_TREE}/$(patsubst install-%,build-%,$@) && make install $(shell [ "`which makeinfo`" ] || echo 'MAKEINFO=/bin/true') ) ;\
-#		}
-#endif
 ALL_PACKAGES+=cross-binutils
 endif
