@@ -3,11 +3,13 @@
 # packages
 
 include ${PACKAGE_DIR}/busybox/v1.20.2.mk
+include ${PACKAGE_DIR}/linux/v3.4.113-qdnbl.mk
 include ${PACKAGE_DIR}/uClibc/v0.9.33.2-qdnbl.mk
 
 ROOTFS_PACKAGES= \
 	target-uclibc \
-	target-busybox
+	target-busybox \
+	target-lximage
 
 ifneq (${ROOTFS_PACKAGES},)
 -include ${CONFIG_DIR}/functions.mk
