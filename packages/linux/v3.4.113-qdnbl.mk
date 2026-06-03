@@ -81,5 +81,43 @@ install-toolchain-lxheaders: build-toolchain-lxheaders
 			ARCH=${TARGET_ARCH} INSTALL_HDR_PATH=${TOOLCHAIN_DIR}/usr ;\
 		}
 
+#
+
+.PHONY: build-target-lximage
+build-target-lximage: \
+		all-toolchain \
+		prepare-lxheaders
+	mkdir -p ${TARGET_LINUX_SRC_TREE}/$@
+	[ -r ${TARGET_LINUX_SRC_TREE}/$@/.config ] || { \
+		printf '[%s] %s\n' $@ 'Configure...' && \
+		cd ${TARGET_LINUX_SRC_TREE}/$@ && \
+		cp ${TARGET_LINUX_SRC_TREE}/prepare-lxheaders/.config .config && \
+		make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} prepare &&\
+		cp ${TARGET_LINUX_SRC_TREE}/scripts/config ./scripts &&\
+		scripts/config --enable BLK_DEV_INITRD &&\
+		scripts/config --enable EXT2_FS &&\
+		scripts/config --enable SQUASHFS --enable BLK_DEV_RAM &&\
+		yes '' | make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
+			 ARCH=${TARGET_ARCH} oldconfig ;\
+		}
+	[ -r ${TARGET_LINUX_SRC_TREE}/$@/arch/${TARGET_ARCH}/boot/bzImage ] || { \
+		printf '[%s] %s\n' $@ 'Build...' && \
+		cd ${TARGET_LINUX_SRC_TREE}/$@ && \
+		make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
+			bzImage \
+			ARCH=${TARGET_ARCH} KBUILD_VERBOSE=1 ;\
+	}
+
+
+.PHONY: install-target-lximage
+
+install-target-lximage: \
+		build-target-lximage
+	[ -r ${PACKAGE_DESTDIR}/boot/bzImage ] || { \
+		cd ${TARGET_LINUX_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
+		mkdir -p ${PACKAGE_DESTDIR}/boot &&\
+		cp arch/x86/boot/bzImage ${PACKAGE_DESTDIR}/boot ;\
+	}
+
 ALL_PACKAGES+=linux
 endif
