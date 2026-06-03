@@ -3,6 +3,7 @@
 
 # packages
 
+include ${PACKAGE_DIR}/linux/v3.4.113.mk
 include ${PACKAGE_DIR}/dash/v0.5.12.mk
 include ${PACKAGE_DIR}/musl/v0.9.15.mk
 include ${PACKAGE_DIR}/sbase/v0.1.mk
@@ -57,7 +58,7 @@ install-initrd-squashfs: \
 	( cd ${INITRD_STAGING_DIR} && /usr/bin/mksquashfs . ${INITRD_STAGING_DIR}.squashfs -noappend -all-root -nopad )
 
 
-all-initrd: install-initrd-${INITRD_MEDIA_TYPE}
+all-initrd: build-target-lximage install-initrd-${INITRD_MEDIA_TYPE}
 	@printf '[initrd %s] %s\n' $@ "Done (built $(words ${INITRD_PACKAGES})) at `date +'%F, %X'`"
 
 #
