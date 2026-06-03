@@ -2,10 +2,17 @@
 
 # packages
 
--include ${CONFIG_DIR}/functions.mk
-
-include ${PACKAGE_DIR}/glibc/v2.14-qdglibc.mk
 include ${PACKAGE_DIR}/dash/v0.5.8.mk
+include ${PACKAGE_DIR}/glibc/v2.14-qdglibc.mk
+
+ROOTFS_PACKAGES= \
+	target-glibc \
+	target-dash
+
+ifneq (${ROOTFS_PACKAGES},)
+-include ${CONFIG_DIR}/functions.mk
+endif
+
 
 #
 
@@ -16,9 +23,8 @@ PACKAGE_DESTDIR=${STAGING_DIR}/rootfs
 
 all-rootfs: \
 	all-toolchain \
-	install-target-glibc \
-	install-target-dash
-	@printf '[rootfs %s] %s\n' $@ "Done at `date +'%F, %X'`"
+	$(addprefix install-,${ROOTFS_PACKAGES})
+	@printf '[rootfs %s] %s\n' $@ "Done (built $(words ${ROOTFS_PACKAGES})) at `date +'%F, %X'`"
 
 #
 
