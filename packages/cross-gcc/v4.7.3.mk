@@ -112,14 +112,16 @@ build-toolchain-cross-gcc: prepare-cross-gcc
 			--prefix=${TOOLCHAIN_DIR} \
 			--build=${HOST_TRIPLET} --host=${HOST_TRIPLET} \
 			--target=${TARGET_TRIPLET} \
-			--with-sysroot=${TOOLCHAIN_DIR} --disable-nls  --disable-shared \
+			--with-sysroot=${TOOLCHAIN_DIR} \
 			--without-headers --with-newlib \
+			--disable-shared \
 			--disable-decimal-float --disable-libgomp \
 			--disable-libmudflap \
 			--disable-libquadmath \
 			--disable-libssp --disable-threads \
 			--enable-languages=c --enable-clocale=musl --disable-__cxa_atexit \
-			--disable-multilib ;\
+			--disable-multilib \
+			--disable-nls ;\
 		}
 	[ -r ${CROSS_GCC_SRC_TREE}/$@/gcc/include-fixed/README ] || { \
 		printf '[%s] %s\n' $@ 'Build...' && \
