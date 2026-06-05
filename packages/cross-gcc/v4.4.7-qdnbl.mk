@@ -193,9 +193,9 @@ build-cross-gcc: prepare-cross-gcc
 			--build=${HOST_TRIPLET} --host=${HOST_TRIPLET} \
 			--target=${TARGET_TRIPLET} \
 			--with-sysroot=${TOOLCHAIN_DIR} \
-			$(shell echo "--with-headers=${TOOLCHAIN_DIR}/usr/include" 2>/dev/null) \
+			--with-headers=${TOOLCHAIN_DIR}/usr/include \
 			--disable-multilib \
-			--disable-shared $(shell echo "--enable-shared" >/dev/null) \
+			--disable-shared \
 			--disable-threads \
 			--disable-decimal-float \
 			--disable-libgomp \
