@@ -4,10 +4,12 @@
 
 include ${PACKAGE_DIR}/dash/v0.5.8.mk
 include ${PACKAGE_DIR}/glibc/v2.14-qdglibc.mk
+include ${PACKAGE_DIR}/linux/v3.4.113-qdnbl.mk
 
 ROOTFS_PACKAGES= \
 	target-glibc \
-	target-dash
+	target-dash \
+	target-lximage
 
 ifneq (${ROOTFS_PACKAGES},)
 -include ${CONFIG_DIR}/functions.mk
