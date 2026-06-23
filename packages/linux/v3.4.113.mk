@@ -53,11 +53,12 @@ build-toolchain-lxheaders: prepare-lxheaders
 .PHONY: install-toolchain-lxheaders
 
 install-toolchain-lxheaders: build-toolchain-lxheaders
-	[ -r ${TOOLCHAIN_DIR}/${TARGET_TRIPLET}/include/asm/.install ] || { \
+	[ -r ${TOOLCHAIN_DIR}/usr/include/asm/.install ] || { \
 		printf '[%s] %s\n' $@ 'Install...' && \
 		cd ${TARGET_LINUX_SRC_TREE}/$(patsubst install-%,build-%,$@) && \
 		LANG=C make O=$${PWD} -C ${TARGET_LINUX_SRC_TREE} \
-			headers_install INSTALL_HDR_PATH=${TOOLCHAIN_DIR}/${TARGET_TRIPLET} ;\
+			headers_install INSTALL_HDR_PATH=${TOOLCHAIN_DIR}/usr ;\
 		}
+
 ALL_PACKAGES+=linux
 endif
