@@ -7,7 +7,7 @@
 
 include ${PACKAGE_DIR}/cross-binutils/v2.21.1-qdsp.mk
 include ${PACKAGE_DIR}/cross-gcc/v4.3.6-qdsp.mk
-include ${PACKAGE_DIR}/linux/v3.4.113-qduclibc.mk
+include ${PACKAGE_DIR}/linux/v3.4.113.mk
 include ${PACKAGE_DIR}/uClibc-ng/v1.0.0.mk
 
 #
