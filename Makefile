@@ -39,6 +39,18 @@ ifneq (${HAVE_SETTINGS}$(if ${ALL_COMPONENTS},y,),yy)
 endif
 
 
+.PHONY: all
+
+all-%:
+	@if [ "$(if $(filter $*,${ALL_COMPONENTS}),,n)" = 'n' ] ; then \
+		echo "$@: ERROR: Non-supported component '$*'" ; exit 1 ;\
+	else \
+		make -f ${CONFIG_DIR}/$*.mk $@ ;\
+	fi
+
+all: config-sanity $(patsubst %,all-%,${ALL_COMPONENTS})
+
+
 .PHONY: clean distclean
 
 clean:: config-sanity
