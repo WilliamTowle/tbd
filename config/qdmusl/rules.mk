@@ -10,6 +10,9 @@ include ${CONFIG_DIR}/rootfs.mk
 ${DOWNLOAD_DIR}: ; @mkdir -p $@
 ${STAGING_DIR}: ; @mkdir -p $@
 
+${TARGET_PACKAGES_DIR}: ; @mkdir -p $@
+${TARGET_STAGING_DIR}: ; @mkdir -p $@
+
 
 ##
 
