@@ -2,6 +2,7 @@
 
 include ${CONFIG_DIR}/toolchain.mk
 include ${CONFIG_DIR}/rootfs.mk
+include ${CONFIG_DIR}/bootfiles.mk
 
 
 ##

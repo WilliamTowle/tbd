@@ -56,7 +56,6 @@ $(patsubst %,rootfs-build-tarball-%,${ROOTFS_PACKAGES}): TARBALL_DESTDIR=${TARGE
 
 rootfs-build-tarball-busybox: PKGVER=${TARGET_BUSYBOX_VERSION}
 rootfs-build-tarball-glibc: PKGVER=${COMMON_GLIBC_VERSION}
-rootfs-build-tarball-bootfiles-kernel: PKGVER=${TARGET_LINUX_VERSION}
 
 
 $(patsubst %,rootfs-build-tarball-%,${ROOTFS_PACKAGES}): rootfs-build-tarball-%: \
