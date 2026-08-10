@@ -49,7 +49,7 @@ endif
 $(patsubst %,rootfs-build-tarball-%,${ROOTFS_PACKAGES}): TARBALL_DESTDIR=${TARGET_PACKAGES_DIR}/$*
 
 rootfs-build-tarball-busybox: PKGVER=${TARGET_BUSYBOX_VERSION}
-rootfs-build-tarball-glibc: PKGVER=${COMMON_GLIBC_VERSION}
+rootfs-build-tarball-musl: PKGVER=${COMMON_MUSL_VERSION}
 
 
 $(patsubst %,rootfs-build-tarball-%,${ROOTFS_PACKAGES}): rootfs-build-tarball-%: \
