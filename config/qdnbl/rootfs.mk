@@ -1,9 +1,10 @@
 ## TBD -- "Tiny By Design" rootfs component
 
+include ${PACKAGE_DIR}/base-files/v0.1.mk
 include ${PACKAGE_DIR}/busybox/v1.20.2.mk
 include ${PACKAGE_DIR}/uClibc/v0.9.33.2-qdnbl.mk
 
-ROOTFS_PACKAGES=busybox uclibc
+ROOTFS_PACKAGES=base-files busybox uclibc
 
 ifneq (${ROOTFS_PACKAGES},)
 include ${CONFIG_DIR}/functions.mk
@@ -49,6 +50,7 @@ endif
 
 $(patsubst %,rootfs-build-tarball-%,${ROOTFS_PACKAGES}): TARBALL_DESTDIR=${TARGET_PACKAGES_DIR}/$*
 
+rootfs-build-tarball-base-files: PKGVER=${TARGET_BASE_FILES_VERSION}
 rootfs-build-tarball-busybox: PKGVER=${TARGET_BUSYBOX_VERSION}
 rootfs-build-tarball-uclibc: PKGVER=${COMMON_UCLIBC_VERSION}
 
