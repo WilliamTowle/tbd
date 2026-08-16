@@ -1,9 +1,10 @@
 ## TBD -- "Tiny By Design" rootfs component
 
+include ${PACKAGE_DIR}/base-files/v0.1.mk
 include ${PACKAGE_DIR}/busybox/v1.24.2.mk
 include ${PACKAGE_DIR}/musl/v0.9.15.mk
 
-ROOTFS_PACKAGES=musl busybox
+ROOTFS_PACKAGES=base-files musl busybox
 
 ifneq (${ROOTFS_PACKAGES},)
 include ${CONFIG_DIR}/functions.mk
@@ -48,6 +49,7 @@ endif
 
 $(patsubst %,rootfs-build-tarball-%,${ROOTFS_PACKAGES}): TARBALL_DESTDIR=${TARGET_PACKAGES_DIR}/$*
 
+rootfs-build-tarball-base-files: PKGVER=${TARGET_BASE_FILES_VERSION}
 rootfs-build-tarball-busybox: PKGVER=${TARGET_BUSYBOX_VERSION}
 rootfs-build-tarball-musl: PKGVER=${COMMON_MUSL_VERSION}
 
