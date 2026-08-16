@@ -1,9 +1,10 @@
 ## TBD -- "Tiny By Design" rootfs component
 
+include ${PACKAGE_DIR}/base-files/v0.1.mk
 include ${PACKAGE_DIR}/busybox/v1.20.2.mk
 include ${PACKAGE_DIR}/glibc/v2.14-qdglibc.mk
 
-ROOTFS_PACKAGES=glibc busybox
+ROOTFS_PACKAGES=base-files glibc busybox
 
 ifneq (${ROOTFS_PACKAGES},)
 include ${CONFIG_DIR}/functions.mk
@@ -54,6 +55,7 @@ endif
 
 $(patsubst %,rootfs-build-tarball-%,${ROOTFS_PACKAGES}): TARBALL_DESTDIR=${TARGET_PACKAGES_DIR}/$*
 
+rootfs-build-tarball-base-files: PKGVER=${TARGET_BASE_FILES_VERSION}
 rootfs-build-tarball-busybox: PKGVER=${TARGET_BUSYBOX_VERSION}
 rootfs-build-tarball-glibc: PKGVER=${COMMON_GLIBC_VERSION}
 
