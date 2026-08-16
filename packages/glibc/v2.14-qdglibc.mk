@@ -1,4 +1,4 @@
-## TBD -- "Tiny By Design" musl package
+## TBD -- "Tiny By Design" glibc package
 
 ## glibc -- www.gnu.org
 
@@ -154,11 +154,8 @@ install-target-glibc: build-target-glibc
 			mkdir -p ${PACKAGE_DESTDIR}/lib/ &&\
 			for TCLIB in \
 				libc.so.* libm.so.* \
-				; do \
-					cp ${TOOLCHAIN_DIR}/lib/$${TCLIB} ${PACKAGE_DESTDIR}/lib/ ;\
-				done && \
-			for TCLIB in \
 				ld*.so.* \
+				libresolv*.so.* libnss_[df]*.so.* \
 				; do \
 					cp ${TOOLCHAIN_DIR}/lib/$${TCLIB} ${PACKAGE_DESTDIR}/lib/ ;\
 				done ;;\
@@ -166,11 +163,8 @@ install-target-glibc: build-target-glibc
 			mkdir -p ${PACKAGE_DESTDIR}/lib64/ &&\
 			for TCLIB in \
 				libc.so.* libm.so.* \
-				; do \
-					cp ${TOOLCHAIN_DIR}/lib64/$${TCLIB} ${PACKAGE_DESTDIR}/lib64/ ;\
-				done && \
-			for TCLIB in \
 				ld*.so.* \
+				libresolv*.so.* libnss_[df]*.so.* \
 				; do \
 					cp ${TOOLCHAIN_DIR}/lib64/$${TCLIB} ${PACKAGE_DESTDIR}/lib64/ ;\
 				done ;;\
