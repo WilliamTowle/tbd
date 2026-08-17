@@ -1,6 +1,6 @@
 ## TBD -- "Tiny By Design" bootfiles component
 
-include ${PACKAGE_DIR}/linux/v3.4.113.mk
+include ${PACKAGE_DIR}/linux/v3.18.109.mk
 
 include ${CONFIG_DIR}/functions.mk
 
