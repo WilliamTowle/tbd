@@ -5,8 +5,10 @@ include ${PACKAGE_DIR}/cross-binutils/v2.21.1-qdnbl.mk
 include ${PACKAGE_DIR}/cross-gcc/v4.4.7-qdnbl.mk
 include ${PACKAGE_DIR}/glibc/v2.14-qdglibc.mk
 include ${PACKAGE_DIR}/linux/v3.18.109-qdnbl.mk
+include ${PACKAGE_DIR}/m4/v1.4.19.mk
 
 TOOLCHAIN_PACKAGES= \
+		toolchain-m4 \
 		toolchain-autoconf \
 		toolchain-cross-binutils \
 		toolchain-cross-kgcc \
