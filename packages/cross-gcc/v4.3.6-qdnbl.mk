@@ -101,6 +101,7 @@ build-toolchain-cross-kgcc: prepare-cross-gcc
 	[ -r ${CROSS_GCC_SRC_TREE}/$@/config.log ] || { \
 		printf '[%s] %s\n' $@ 'Configure...' && \
 		cd ${CROSS_GCC_SRC_TREE}/$@ && \
+		  CFLAGS='-Wno-error=incompatible-pointer-types' \
 		  ../configure \
 			--prefix=${TOOLCHAIN_DIR} \
 			--program-transform-name='s%^%'${TARGET_CPU}-${TARGET_VENDOR}'-linux-none-%' \
