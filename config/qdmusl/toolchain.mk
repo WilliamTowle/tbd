@@ -4,9 +4,11 @@ include ${PACKAGE_DIR}/autoconf/v2.69.mk
 include ${PACKAGE_DIR}/linux/v3.18.109.mk
 include ${PACKAGE_DIR}/cross-binutils/v2.23.2.mk
 include ${PACKAGE_DIR}/cross-gcc/v4.7.3.mk
+include ${PACKAGE_DIR}/m4/v1.4.19.mk
 include ${PACKAGE_DIR}/musl/v0.9.15.mk
 
 TOOLCHAIN_PACKAGES= \
+		toolchain-m4 \
 		toolchain-autoconf \
 		toolchain-lxheaders \
 		toolchain-cross-binutils \
