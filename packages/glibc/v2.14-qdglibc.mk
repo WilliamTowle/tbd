@@ -64,6 +64,7 @@ build-cross-glibc-startfiles: prepare-common-glibc
 		CC=${TARGET_CPU}-${TARGET_VENDOR}-linux-none-gcc \
 		  AS=${TARGET_CPU}-${TARGET_VENDOR}-linux-none-as \
 		  LD=${TARGET_CPU}-${TARGET_VENDOR}-linux-none-ld \
+		  MAKE=${TOOLCHAIN_DIR}/bin/make \
 		  libc_cv_forced_unwind=yes \
 		  libc_cv_c_cleanup=yes \
 			../configure \
@@ -107,6 +108,7 @@ build-cross-glibc-libc: prepare-common-glibc
 		CC=${TARGET_CPU}-${TARGET_VENDOR}-linux-none-gcc \
 		  AS=${TARGET_CPU}-${TARGET_VENDOR}-linux-none-as \
 		  LD=${TARGET_CPU}-${TARGET_VENDOR}-linux-none-ld \
+		  MAKE=${TOOLCHAIN_DIR}/bin/make \
 		  libc_cv_forced_unwind=yes \
 		  libc_cv_c_cleanup=yes \
 		  libc_cv_slibdir=$(if $(filter i%86,${TARGET_CPU}),/lib,/lib64) \
